@@ -11,8 +11,6 @@ import numpy as np
 from tqdm import tqdm
 from transformers import Wav2Vec2Model, Wav2Vec2FeatureExtractor
 from pathlib import Path
-import subprocess
-import tempfile
 
 # --------------------------- CONFIG ---------------------------
 MODEL_NAME = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim"
@@ -52,34 +50,19 @@ def extract_embeddings_batch(waveforms: list[torch.Tensor]) -> np.ndarray:
 
 # --------------------------- MAIN PROCESSING ---------------------------
 def process_folder(input_folder: str):
-    video_paths = []
-    for ext in ["*.mp4", "*.avi", "*.mov", "*.mkv", "*.flv", "*.wmv", "*.MP4"]:
-        video_paths.extend(Path(input_folder).rglob(ext))
+    audio_paths = []
+    for ext in ["*.mp3", "*.wav", "*.flac", "*.aac", "*.ogg"]:
+        audio_paths.extend(Path(input_folder).rglob(ext))
 
-    print(f"Found {len(video_paths)} video files. Starting audio extraction...")
+    print(f"Found {len(audio_paths)} audio files. Starting audio feature extraction...")
 
     batch_waveforms = []
     batch_paths = []
 
-    for path in tqdm(video_paths, desc="Processing videos"):
-        temp_wav = None
+    for path in tqdm(audio_paths, desc="Processing audio files"):
         try:
-            # 1. Extract audio with ffmpeg
-            temp_wav = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
-            temp_wav.close()
-
-            cmd = [
-                "ffmpeg", "-y", "-i", str(path),
-                "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",
-                temp_wav.name
-            ]
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"FFmpeg failed on {path.name}: {result.stderr}")
-                continue
-
-            # 2. Load audio
-            wav, sr = torchaudio.load(temp_wav.name)
+            # 1. Load audio directly
+            wav, sr = torchaudio.load(str(path))
             if wav.size(0) > 1:
                 wav = wav.mean(dim=0, keepdim=True)   # stereo → mono
             wav = wav.squeeze(0)  # (T,)
@@ -87,12 +70,16 @@ def process_folder(input_folder: str):
             batch_waveforms.append(wav)
             batch_paths.append(path)
 
-            # 3. Process full batch
+            # 2. Process full batch
             if len(batch_waveforms) >= BATCH_SIZE:
                 embeddings = extract_embeddings_batch(batch_waveforms)
 
                 for emb, p in zip(embeddings, batch_paths):
-                    out_path = OUTPUT_DIR / f"{p.stem}.npy"
+                    # Parse actor from filename (last part of stem)
+                    parts = p.stem.split('-')
+                    actor = parts[-1]
+                    emotion = '-'.join(parts)
+                    out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
                     np.save(out_path, emb.astype(np.float16))
                     # print(f"Saved → {out_path.name}")
 
@@ -101,16 +88,16 @@ def process_folder(input_folder: str):
 
         except Exception as e:
             print(f"Error on {path.name}: {e}")
-        finally:
-            if temp_wav and os.path.exists(temp_wav.name):
-                os.unlink(temp_wav.name)
 
     # --------------------------- FINAL BATCH (always runs) ---------------------------
     if batch_waveforms:
         print(f"Processing final batch of {len(batch_waveforms)} clips...")
         embeddings = extract_embeddings_batch(batch_waveforms)
         for emb, p in zip(embeddings, batch_paths):
-            out_path = OUTPUT_DIR / f"{p.stem}.npy"
+            parts = p.stem.split('-')
+            actor = parts[-1]
+            emotion = '-'.join(parts)
+            out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
             np.save(out_path, emb.astype(np.float16))
             print(f"Saved → {out_path.name}")
 
@@ -119,4 +106,4 @@ def process_folder(input_folder: str):
 
 # --------------------------- RUN ---------------------------
 if __name__ == "__main__":
-    process_folder("/home/sionna/Downloads/1188976")
+    process_folder("/home/sionna/evan/multi-modal-emotion-recognition/extracted_audio")

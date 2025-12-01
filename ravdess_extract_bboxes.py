@@ -5,9 +5,13 @@ import cv2
 import os
 from pathlib import Path
 import glob
+from ultralytics import YOLO
+from huggingface_hub import hf_hub_download
 
-# Load the pre-trained face detection model using OpenCV Haar cascades
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+# Download and load the pre-trained YOLO face detection model from Hugging Face
+os.makedirs("models", exist_ok=True)
+model_path = hf_hub_download(repo_id="AdamCodd/YOLOv11n-face-detection", filename="model.pt", local_dir="models")
+model = YOLO(model_path, device=0)  # Use GPU (device=0) for faster processing
 
 input_dir = "/home/sionna/Downloads/1188976"  # <-- Change this to the directory containing child folders with videos
 output_bboxes_folder = "extracted_bboxes"  # Where to save bounding box data
@@ -35,18 +39,17 @@ for subdir in os.listdir(input_dir):
                 
                 frame_number += 1
                 
-                # Convert to grayscale for face detection
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                # Detect faces using YOLO
+                results = model(frame, conf=0.5)
                 
-                # Detect faces
-                faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-                
-                for (x, y, w, h) in faces:
-                    x1, y1, x2, y2 = x, y, x + w, y + h
-                    confidence = 1.0  # Haar cascades don't provide confidence, set to 1.0
-                    
-                    # Store bounding box data
-                    bboxes.append(f"{frame_number},{x1},{y1},{x2},{y2},{confidence:.2f}")
+                for result in results:
+                    boxes = result.boxes
+                    for box in boxes:
+                        x1, y1, x2, y2 = box.xyxy[0].tolist()
+                        confidence = box.conf[0].item()
+                        
+                        # Store bounding box data
+                        bboxes.append(f"{frame_number},{int(x1)},{int(y1)},{int(x2)},{int(y2)},{confidence:.2f}")
             
             cap.release()
             

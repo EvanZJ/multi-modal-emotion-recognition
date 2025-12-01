@@ -11,7 +11,10 @@ def video_to_audio(video_path, output_path=None, bitrate="320k"):
         return False
 
     if output_path is None:
-        output_path = os.path.splitext(video_path)[0] + ".mp3"
+        base_name = os.path.splitext(os.path.basename(video_path))[0]
+        output_path = os.path.join("extracted_audio", base_name + ".mp3")
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     print(f"Extracting → {output_path}")
 
