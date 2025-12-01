@@ -103,13 +103,7 @@ class ViViTFeatureExtractor(nn.Module):
             features = x.mean(dim=1)
         return features
 
-# Example usage:
-# model = ViViTFeatureExtractor()
-# video = torch.randn(1, 3, 32, 224, 224)  # Dummy video input
-# features = model(video)
-# print(features.shape)  # Should be torch.Size([1, 768])
-
-def load_video(video_path, num_frames=32, size=(224, 224)):
+def load_video(video_path, chunk_size=32, size=(224, 224)):
     cap = cv2.VideoCapture(video_path)
     frames = []
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -118,59 +112,62 @@ def load_video(video_path, num_frames=32, size=(224, 224)):
         cap.release()
         return None
     
-    if total_frames < num_frames:
-        # Sample all frames and pad by duplicating the last frame
-        for i in range(total_frames):
-            ret, frame = cap.read()
-            if ret:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, size)
-                frames.append(frame)
-        while len(frames) < num_frames:
-            frames.append(frames[-1] if frames else np.zeros((size[1], size[0], 3), dtype=np.uint8))
-    else:
-        step = total_frames // num_frames
-        for i in range(0, total_frames, step):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-            ret, frame = cap.read()
-            if ret:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, size)
-                frames.append(frame)
-            if len(frames) == num_frames:
-                break
+    # Load all frames
+    for i in range(total_frames):
+        ret, frame = cap.read()
+        if ret:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = cv2.resize(frame, size)
+            frames.append(frame)
     
     cap.release()
     
-    if len(frames) != num_frames:
+    if not frames:
         return None
     
-    # Convert to tensor: (t, h, w, c) -> (t, c, h, w) -> (1, c, t, h, w)
+    # Convert to tensor: list of (h, w, c) -> stack to (t, c, h, w)
     video = torch.stack([torch.from_numpy(f).permute(2, 0, 1).float() / 255.0 for f in frames])
-    video = video.unsqueeze(0).permute(0, 2, 1, 3, 4)  # (1, 3, 32, 224, 224)
-    return video
+    
+    # Split into chunks of chunk_size, pad last chunk if needed
+    num_chunks = (len(frames) + chunk_size - 1) // chunk_size  # Ceiling division
+    padded_frames = len(frames)
+    if padded_frames % chunk_size != 0:
+        pad_len = chunk_size - (padded_frames % chunk_size)
+        last_frame = video[-1].clone()  # Duplicate last frame for padding
+        padding = last_frame.unsqueeze(0).repeat(pad_len, 1, 1, 1)
+        video = torch.cat([video, padding], dim=0)
+    
+    # Reshape to (num_chunks, c, chunk_size, h, w) but actually (num_chunks, c, t, h, w) with t=chunk_size
+    chunks = video.view(num_chunks, 3, chunk_size, size[1], size[0])
+    
+    return chunks  # Shape: (num_chunks, 3, 32, 224, 224)
 
-def extract_features(video_path, model, device):
-    video_tensor = load_video(video_path)
-    if video_tensor is None:
+def extract_features(video_path, model, device, chunk_size=32):
+    video_chunks = load_video(video_path, chunk_size)
+    if video_chunks is None:
         print(f"Failed to load video: {video_path}")
         return None
-    video_tensor = video_tensor.to(device)
+    video_chunks = video_chunks.to(device)
+    features_list = []
     with torch.no_grad():
-        features = model(video_tensor)
+        for chunk in video_chunks:
+            chunk = chunk.unsqueeze(0)  # Add batch dim: (1, 3, 32, 224, 224)
+            features = model(chunk)
+            features_list.append(features)
+    features = torch.cat(features_list, dim=0)  # (num_chunks, 768)
     return features.cpu().numpy()
 
-def process_folder(folder_path, model, device):
+def process_folder(folder_path, model, device, chunk_size=32):
     extensions = {'.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.webm', '.m4v', '.mpg', '.mpeg'}
     count = 0
-    output_dir = "video_features"
+    output_dir = "/home/sionna/evan/multi-modal-emotion-recognition/video_features"
     os.makedirs(output_dir, exist_ok=True)
     for root, _, files in os.walk(folder_path):
         for file in files:
             if file.lower().endswith(tuple(extensions)):
                 video_path = os.path.join(root, file)
                 print(f"Processing: {video_path}")
-                features = extract_features(video_path, model, device)
+                features = extract_features(video_path, model, device, chunk_size)
                 if features is not None:
                     # Create a unique name based on relative path
                     rel_path = os.path.relpath(video_path, folder_path)
