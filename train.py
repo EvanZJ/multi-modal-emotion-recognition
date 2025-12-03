@@ -13,6 +13,7 @@ import json
 import argparse
 from collections import Counter
 from sklearn.metrics import precision_recall_fscore_support
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 class CrossModalFusion(nn.Module):
     """
@@ -74,7 +75,7 @@ class EmotionClassifier(nn.Module):
     Deeper classifier on top of fused embedding to add capacity.
     - Multiple FC layers with ReLU and dropout.
     """
-    def __init__(self, input_dim=512, num_classes=8, dropout=0.3):
+    def __init__(self, input_dim=512, num_classes=6, dropout=0.3):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, input_dim // 2)
         self.dropout1 = nn.Dropout(dropout)
@@ -90,7 +91,7 @@ class EmotionClassifier(nn.Module):
 
 # Example full model
 class MultimodalEmotionModel(nn.Module):
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=8, max_seq_len=101):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=101):
         super().__init__()
         self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.3, max_seq_len=max_seq_len)
         self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.3)
@@ -134,6 +135,13 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
         video_features.append(torch.tensor(v_feat, dtype=torch.float32))
         audio_features.append(torch.tensor(a_feat, dtype=torch.float32))
         labels.append(label)
+    
+    # Compute max_chunks
+    if video_features:
+        max_chunks = max(v.shape[0] for v in video_features)
+    else:
+        max_chunks = 0
+    print(f"Maximum number of video chunks: {max_chunks}")
             
     # Dataset as list of tuples (variable-length videos ok)
     dataset = list(zip(video_features, audio_features, labels))
@@ -169,18 +177,20 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     val_labels = [dataset[i][2] for i in val_indices]
     test_labels = [dataset[i][2] for i in test_indices]
     
-    return train_loader, val_loader, test_loader
+    return train_loader, val_loader, test_loader, max_chunks
     
 
-def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=1e-4, batch_size=16, device='cuda'):
+def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=1e-4, weight_decay=1e-5, patience=50, batch_size=16, device='cuda'):
     model.to(device)
-    criterion = nn.CrossEntropyLoss()  # For multi-class labels (integers 0-6)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    criterion = nn.CrossEntropyLoss()  # For multi-class labels (integers 0-5)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20)
     
     results = []
     best_val_loss = float('inf')
     best_model_state = None
     best_epoch = 0
+    epochs_without_improvement = 0
     
     for epoch in range(num_epochs):
         # Training
@@ -230,11 +240,19 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=
         avg_val_loss = total_val_loss / len(val_loader)
         val_acc = 100 * correct / total
         
+        scheduler.step(avg_val_loss)
+        
         # Check if this is the best model
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             best_model_state = model.state_dict().copy()
             best_epoch = epoch + 1
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+            if epochs_without_improvement >= patience:
+                print(f"Early stopping at epoch {epoch+1}")
+                break
         
         # Compute additional metrics for validation
         macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(all_labels_list, all_preds, average='macro')
@@ -316,19 +334,19 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     args = parser.parse_args()
     
-    train_loader, val_loader, test_loader = load_data(
+    train_loader, val_loader, test_loader, max_chunks = load_data(
         video_feat_dir="/home/sionna/evan/multi-modal-emotion-recognition/video_features",
         audio_feat_dir="/home/sionna/evan/multi-modal-emotion-recognition/audio_features",
         batch_size=args.batch_size
     )
     print(f"Train samples: {len(train_loader.dataset)}, Val samples: {len(val_loader.dataset)}, Test samples: {len(test_loader.dataset)}")
     
-    # Initialize model
-    model = MultimodalEmotionModel(video_dim=768, audio_dim=1024, fused_dim=512, num_classes=8)
+    # Initialize model with max_seq_len = max_chunks + 1 (for audio token)
+    max_seq_len = max_chunks + 1 if max_chunks > 0 else 2  # Minimum 2 if no data
+    model = MultimodalEmotionModel(video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=max_seq_len)
     
     # Train the model
     train_model(model, train_loader, val_loader, test_loader, num_epochs=args.num_epochs, lr=args.lr, batch_size=args.batch_size, device='cuda' if torch.cuda.is_available() else 'cpu')
 
 if __name__ == "__main__":
     main()
-    

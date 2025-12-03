@@ -8,8 +8,6 @@ env/
 venv/
 .venv/
 multi-modal-emotion-recognition/
-audio_features/
-video_features/
 training_runs/
 extracted_audio/
 extracted_bboxes/
