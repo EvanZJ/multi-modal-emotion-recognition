@@ -23,10 +23,12 @@ class CrossModalFusion(nn.Module):
     - Uses transformer layers to fuse them via self-attention.
     - Outputs fused embedding (pooled), and attention weights for interpretability.
     """
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.3, max_seq_len=101):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.2, max_seq_len=101):
         super().__init__()
         self.video_proj = nn.Linear(video_dim, fused_dim)
         self.audio_proj = nn.Linear(audio_dim, fused_dim)
+        self.bn_video = nn.BatchNorm1d(fused_dim)
+        self.bn_audio = nn.BatchNorm1d(fused_dim)
         self.pos_embed = nn.Parameter(torch.randn(1, max_seq_len, fused_dim))  # For max_chunks + audio token
         self.transformer = nn.TransformerEncoder(
             nn.TransformerEncoderLayer(d_model=fused_dim, nhead=num_heads, dim_feedforward=2048, dropout=dropout),
@@ -37,7 +39,15 @@ class CrossModalFusion(nn.Module):
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         b, t, _ = video_feats.shape
         video = self.video_proj(video_feats)  # (b, t, fused_dim)
+        video = video.permute(0, 2, 1)  # (b, fused_dim, t) for BatchNorm
+        video = self.bn_video(video)
+        video = video.permute(0, 2, 1)  # Back to (b, t, fused_dim)
+        
         audio = self.audio_proj(audio_feats.unsqueeze(1))  # (b, 1, fused_dim)
+        audio = audio.permute(0, 2, 1)  # (b, fused_dim, 1)
+        audio = self.bn_audio(audio)
+        audio = audio.permute(0, 2, 1)  # Back to (b, 1, fused_dim)
+        
         combined = torch.cat([video, audio], dim=1)  # (b, t+1, fused_dim)
         combined = combined + self.pos_embed[:, :t+1, :]  # Slice from expanded pos_embed
         
@@ -75,15 +85,18 @@ class EmotionClassifier(nn.Module):
     Deeper classifier on top of fused embedding to add capacity.
     - Multiple FC layers with ReLU and dropout.
     """
-    def __init__(self, input_dim=512, num_classes=6, dropout=0.3):
+    def __init__(self, input_dim=512, num_classes=6, dropout=0.2):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, input_dim // 2)
+        self.bn_fc1 = nn.BatchNorm1d(input_dim // 2)
         self.dropout1 = nn.Dropout(dropout)
         self.fc2 = nn.Linear(input_dim // 2, num_classes)
         self.dropout2 = nn.Dropout(dropout)
 
     def forward(self, fused_embedding):
-        x = F.relu(self.fc1(fused_embedding))
+        x = self.fc1(fused_embedding)
+        x = self.bn_fc1(x)
+        x = F.relu(x)
         x = self.dropout1(x)
         logits = self.fc2(x)
         probs = F.softmax(logits, dim=-1)
@@ -93,8 +106,8 @@ class EmotionClassifier(nn.Module):
 class MultimodalEmotionModel(nn.Module):
     def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=101):
         super().__init__()
-        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.3, max_seq_len=max_seq_len)
-        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.3)
+        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.2, max_seq_len=max_seq_len)
+        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.2)
 
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         fused, attn_weights = self.fusion(video_feats, audio_feats, mask=mask, return_attn=return_attn)
@@ -177,6 +190,10 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     val_labels = [dataset[i][2] for i in val_indices]
     test_labels = [dataset[i][2] for i in test_indices]
     
+    print("Train label distribution:", Counter(train_labels))
+    print("Val label distribution:", Counter(val_labels))
+    print("Test label distribution:", Counter(test_labels))
+    
     return train_loader, val_loader, test_loader, max_chunks
     
 
@@ -184,7 +201,7 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=
     model.to(device)
     criterion = nn.CrossEntropyLoss()  # For multi-class labels (integers 0-5)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20, verbose=True)
     
     results = []
     best_val_loss = float('inf')
