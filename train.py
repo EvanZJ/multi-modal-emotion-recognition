@@ -14,6 +14,8 @@ import argparse
 from collections import Counter
 from sklearn.metrics import precision_recall_fscore_support
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from sklearn.utils.class_weight import compute_class_weight
+from datetime import datetime
 
 class CrossModalFusion(nn.Module):
     """
@@ -23,7 +25,7 @@ class CrossModalFusion(nn.Module):
     - Uses transformer layers to fuse them via self-attention.
     - Outputs fused embedding (pooled), and attention weights for interpretability.
     """
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.2, max_seq_len=101):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.6, max_seq_len=101):
         super().__init__()
         self.video_proj = nn.Linear(video_dim, fused_dim)
         self.audio_proj = nn.Linear(audio_dim, fused_dim)
@@ -35,6 +37,10 @@ class CrossModalFusion(nn.Module):
             num_layers=num_layers
         )
         self.pool = nn.AdaptiveAvgPool1d(1)  # For pooling the sequence to single vector
+        # Store for hyperparameters
+        self.num_layers = num_layers
+        self.num_heads = num_heads
+        self.dropout = dropout
 
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         b, t, _ = video_feats.shape
@@ -85,13 +91,15 @@ class EmotionClassifier(nn.Module):
     Deeper classifier on top of fused embedding to add capacity.
     - Multiple FC layers with ReLU and dropout.
     """
-    def __init__(self, input_dim=512, num_classes=6, dropout=0.2):
+    def __init__(self, input_dim=512, num_classes=6, dropout=0.6):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, input_dim // 2)
         self.bn_fc1 = nn.BatchNorm1d(input_dim // 2)
         self.dropout1 = nn.Dropout(dropout)
         self.fc2 = nn.Linear(input_dim // 2, num_classes)
         self.dropout2 = nn.Dropout(dropout)
+        # Store for hyperparameters
+        self.dropout = dropout
 
     def forward(self, fused_embedding):
         x = self.fc1(fused_embedding)
@@ -106,8 +114,8 @@ class EmotionClassifier(nn.Module):
 class MultimodalEmotionModel(nn.Module):
     def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=101):
         super().__init__()
-        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.2, max_seq_len=max_seq_len)
-        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.2)
+        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.6, max_seq_len=max_seq_len)
+        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.6)
 
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         fused, attn_weights = self.fusion(video_feats, audio_feats, mask=mask, return_attn=return_attn)
@@ -166,6 +174,20 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     temp_labels = [all_labels[i] for i in temp_indices]
     val_indices, test_indices = train_test_split(temp_indices, test_size=0.5, random_state=42, stratify=temp_labels)
     
+    # Oversample label 0 in training set
+    minority_indices = [i for i in train_indices if dataset[i][2] == 0]
+    majority_count = 1170  # From your counter
+    minority_count = len(minority_indices)
+    oversample_factor = majority_count // minority_count
+    additional_minority = minority_indices * (oversample_factor - 1)
+    # Randomly sample to make exact match
+    remaining = majority_count - (minority_count * oversample_factor)
+    additional_minority += np.random.choice(minority_indices, remaining, replace=False).tolist()
+    train_indices += additional_minority
+    
+    # Shuffle after oversampling
+    np.random.shuffle(train_indices)
+    
     # Custom collate function for padding and masking
     def collate_fn(batch):
         videos, audios, labels_batch = zip(*batch)
@@ -185,23 +207,49 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     val_loader = DataLoader([dataset[i] for i in val_indices], batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
     test_loader = DataLoader([dataset[i] for i in test_indices], batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
     
-    # Print label distributions
+    # Print label distributions (updated for oversampled train)
     train_labels = [dataset[i][2] for i in train_indices]
     val_labels = [dataset[i][2] for i in val_indices]
     test_labels = [dataset[i][2] for i in test_indices]
     
-    print("Train label distribution:", Counter(train_labels))
+    print("Train label distribution (after oversampling):", Counter(train_labels))
     print("Val label distribution:", Counter(val_labels))
     print("Test label distribution:", Counter(test_labels))
     
-    return train_loader, val_loader, test_loader, max_chunks
+    # Compute class weights for imbalanced classes (optional, but can combine with oversampling)
+    classes = np.unique(train_labels)
+    class_weights = compute_class_weight(class_weight='balanced', classes=classes, y=train_labels)
+    class_weights = torch.tensor(class_weights, dtype=torch.float32)
+    
+    return train_loader, val_loader, test_loader, max_chunks, class_weights
     
 
-def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=1e-4, weight_decay=1e-5, patience=50, batch_size=16, device='cuda'):
+def train_model(model, train_loader, val_loader, test_loader, class_weights, num_epochs=10, lr=1e-4, weight_decay=2e-4, patience=100, batch_size=16, device='cuda'):
     model.to(device)
-    criterion = nn.CrossEntropyLoss()  # For multi-class labels (integers 0-5)
+    criterion = nn.CrossEntropyLoss(weight=class_weights.to(device))  # Add class weights
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20, verbose=True)
+    
+    # Collect all hyperparameters
+    hyperparameters = {
+        'num_epochs': num_epochs,
+        'lr': lr,
+        'weight_decay': weight_decay,
+        'patience': patience,
+        'batch_size': batch_size,
+        'device': device,
+        'video_dim': model.fusion.video_proj.in_features,
+        'audio_dim': model.fusion.audio_proj.in_features,
+        'fused_dim': model.fusion.video_proj.out_features,
+        'num_classes': model.classifier.fc2.out_features,
+        'max_seq_len': model.fusion.pos_embed.size(1),
+        'fusion_dropout': model.fusion.dropout,
+        'classifier_dropout': model.classifier.dropout,
+        'num_layers': model.fusion.num_layers,
+        'num_heads': model.fusion.num_heads,
+        'scheduler_factor': 0.1,
+        'scheduler_patience': 20
+    }
     
     results = []
     best_val_loss = float('inf')
@@ -324,23 +372,25 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=
     os.makedirs('training_runs', exist_ok=True)
     
     # Save to JSON with hyperparameters in name
-    results_name = f'results_bs{batch_size}_ep{num_epochs}_lr{lr}.json'
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    results_name = f'results_bs{batch_size}_ep{num_epochs}_lr{lr}_{timestamp}.json'
     with open(os.path.join('training_runs', results_name), 'w') as f:
         json.dump({
             "training_progress": results,
             "best_model": {
                 "epoch": best_epoch
-            }
+            },
+            "hyperparameters": hyperparameters
         }, f, indent=4)
     print(f"Training results saved to training_runs/{results_name}")
     
     # Save the best model (based on lowest validation loss)
-    best_model_name = f'best_model_bs{batch_size}_ep{num_epochs}_lr{lr}.pth'
+    best_model_name = f'best_model_bs{batch_size}_ep{num_epochs}_lr{lr}_{timestamp}.pth'
     torch.save(best_model_state, os.path.join('training_runs', best_model_name))
     print(f"Best model (epoch {best_epoch}, val_loss {best_val_loss:.4f}) saved to training_runs/{best_model_name}")
     
     # Save the final model
-    final_model_name = f'final_model_bs{batch_size}_ep{num_epochs}_lr{lr}.pth'
+    final_model_name = f'final_model_bs{batch_size}_ep{num_epochs}_lr{lr}_{timestamp}.pth'
     torch.save(model.state_dict(), os.path.join('training_runs', final_model_name))
     print(f"Final model saved to training_runs/{final_model_name}")
 
@@ -351,7 +401,7 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     args = parser.parse_args()
     
-    train_loader, val_loader, test_loader, max_chunks = load_data(
+    train_loader, val_loader, test_loader, max_chunks, class_weights = load_data(
         video_feat_dir="/home/sionna/evan/multi-modal-emotion-recognition/video_features",
         audio_feat_dir="/home/sionna/evan/multi-modal-emotion-recognition/audio_features",
         batch_size=args.batch_size
@@ -363,7 +413,7 @@ def main():
     model = MultimodalEmotionModel(video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=max_seq_len)
     
     # Train the model
-    train_model(model, train_loader, val_loader, test_loader, num_epochs=args.num_epochs, lr=args.lr, batch_size=args.batch_size, device='cuda' if torch.cuda.is_available() else 'cpu')
+    train_model(model, train_loader, val_loader, test_loader, class_weights, num_epochs=args.num_epochs, lr=args.lr, batch_size=args.batch_size, device='cuda' if torch.cuda.is_available() else 'cpu')
 
 if __name__ == "__main__":
     main()
