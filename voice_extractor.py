@@ -17,6 +17,7 @@ MODEL_NAME = "audeering/wav2vec2-large-robust-12-ft-emotion-msp-dim"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 8                    # ← 8–16 is optimal on GPU. Set to 1 only if you want ultra-safe
 OUTPUT_DIR = Path("audio_features")
+CHUNK_DURATION = 10               # Max duration per chunk in seconds to avoid OOM
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 print(f"Using device: {DEVICE}")
@@ -67,37 +68,77 @@ def process_folder(input_folder: str):
                 wav = wav.mean(dim=0, keepdim=True)   # stereo → mono
             wav = wav.squeeze(0)  # (T,)
 
-            batch_waveforms.append(wav)
-            batch_paths.append(path)
+            duration = len(wav) / sr
+            if duration > CHUNK_DURATION:
+                # Process in chunks
+                chunk_size = int(CHUNK_DURATION * sr)
+                chunks = [wav[i:i+chunk_size] for i in range(0, len(wav), chunk_size) if len(wav[i:i+chunk_size]) > 0]
+                embeddings = []
+                for chunk in chunks:
+                    emb = extract_embeddings_batch([chunk])
+                    embeddings.append(emb[0])
+                if embeddings:
+                    final_emb = np.mean(embeddings, axis=0)
+                    final_emb = final_emb / np.linalg.norm(final_emb)
+                    # Parse filename
+                    stem = path.stem
+                    if '-' in stem:
+                        parts = stem.split('-')
+                        actor = parts[-1]
+                        emotion = '-'.join(parts)
+                        out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
+                    else:
+                        parts = stem.split('_')
+                        actor = parts[0]
+                        emotion = '_'.join(parts[1:])
+                        out_path = OUTPUT_DIR / f"{actor}_{emotion}_voice_mp4_features.npy"
+                    np.save(out_path, final_emb.astype(np.float16))
+            else:
+                # Add to batch for short audios
+                batch_waveforms.append(wav)
+                batch_paths.append(path)
 
-            # 2. Process full batch
-            if len(batch_waveforms) >= BATCH_SIZE:
-                embeddings = extract_embeddings_batch(batch_waveforms)
+                # 2. Process full batch
+                if len(batch_waveforms) >= BATCH_SIZE:
+                    embeddings = extract_embeddings_batch(batch_waveforms)
 
-                for emb, p in zip(embeddings, batch_paths):
-                    # Parse actor from filename (last part of stem)
-                    parts = p.stem.split('-')
-                    actor = parts[-1]
-                    emotion = '-'.join(parts)
-                    out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
-                    np.save(out_path, emb.astype(np.float16))
-                    # print(f"Saved → {out_path.name}")
+                    for emb, p in zip(embeddings, batch_paths):
+                        # Parse filename
+                        stem = p.stem
+                        if '-' in stem:
+                            parts = stem.split('-')
+                            actor = parts[-1]
+                            emotion = '-'.join(parts)
+                            out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
+                        else:
+                            parts = stem.split('_')
+                            actor = parts[0]
+                            emotion = '_'.join(parts[1:])
+                            out_path = OUTPUT_DIR / f"{actor}_{emotion}_voice_mp4_features.npy"
+                        np.save(out_path, emb.astype(np.float16))
+                        # print(f"Saved → {out_path.name}")
 
-                batch_waveforms.clear()
-                batch_paths.clear()
+                    batch_waveforms.clear()
+                    batch_paths.clear()
 
         except Exception as e:
             print(f"Error on {path.name}: {e}")
 
-    # --------------------------- FINAL BATCH (always runs) ---------------------------
     if batch_waveforms:
         print(f"Processing final batch of {len(batch_waveforms)} clips...")
         embeddings = extract_embeddings_batch(batch_waveforms)
         for emb, p in zip(embeddings, batch_paths):
-            parts = p.stem.split('-')
-            actor = parts[-1]
-            emotion = '-'.join(parts)
-            out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
+            stem = p.stem
+            if '-' in stem:
+                parts = stem.split('-')
+                actor = parts[-1]
+                emotion = '-'.join(parts)
+                out_path = OUTPUT_DIR / f"Video_Speech_Actor_{actor}_{emotion}_voice_mp4_features.npy"
+            else:
+                parts = stem.split('_')
+                actor = parts[0]
+                emotion = '_'.join(parts[1:])
+                out_path = OUTPUT_DIR / f"{actor}_{emotion}_voice_mp4_features.npy"
             np.save(out_path, emb.astype(np.float16))
             print(f"Saved → {out_path.name}")
 

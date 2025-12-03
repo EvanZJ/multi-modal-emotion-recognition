@@ -18,7 +18,7 @@ output_bboxes_folder = "extracted_bboxes"  # Where to save bounding box data
 os.makedirs(output_bboxes_folder, exist_ok=True)
 
 # Find all .mp4 videos in the folder
-video_files = glob.glob(os.path.join(input_dir, "*.mp4"))
+video_files = glob.glob(os.path.join(input_dir, "*.flv"))
 for video_path in video_files:
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
@@ -50,7 +50,7 @@ for video_path in video_files:
     cap.release()
     
     # Save bounding boxes to a text file
-    video_name = os.path.basename(video_path).replace('.mp4', '')
+    video_name = os.path.basename(video_path).replace('.flv', '')
     output_file = os.path.join(output_bboxes_folder, f"{video_name}_bboxes.txt")
     with open(output_file, 'w') as f:
         f.write('\n'.join(bboxes))

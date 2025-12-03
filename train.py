@@ -22,11 +22,11 @@ class CrossModalFusion(nn.Module):
     - Uses transformer layers to fuse them via self-attention.
     - Outputs fused embedding (pooled), and attention weights for interpretability.
     """
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=2, num_heads=8, dropout=0.1):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.3, max_seq_len=101):
         super().__init__()
         self.video_proj = nn.Linear(video_dim, fused_dim)
         self.audio_proj = nn.Linear(audio_dim, fused_dim)
-        self.pos_embed = nn.Parameter(torch.randn(1, 101, fused_dim))  # For max_chunks + audio token, assuming max_chunks <=100
+        self.pos_embed = nn.Parameter(torch.randn(1, max_seq_len, fused_dim))  # For max_chunks + audio token
         self.transformer = nn.TransformerEncoder(
             nn.TransformerEncoderLayer(d_model=fused_dim, nhead=num_heads, dim_feedforward=2048, dropout=dropout),
             num_layers=num_layers
@@ -38,7 +38,7 @@ class CrossModalFusion(nn.Module):
         video = self.video_proj(video_feats)  # (b, t, fused_dim)
         audio = self.audio_proj(audio_feats.unsqueeze(1))  # (b, 1, fused_dim)
         combined = torch.cat([video, audio], dim=1)  # (b, t+1, fused_dim)
-        combined = combined + self.pos_embed[:, :t+1, :]  # Assuming pos_embed expanded to max possible t+1
+        combined = combined + self.pos_embed[:, :t+1, :]  # Slice from expanded pos_embed
         
         # Padding mask for transformer: (b, t+1), True=ignore
         if mask is not None:
@@ -71,26 +71,29 @@ class CrossModalFusion(nn.Module):
 
 class EmotionClassifier(nn.Module):
     """
-    Simple classifier on top of fused embedding.
-    - FC layer to num_classes, softmax.
+    Deeper classifier on top of fused embedding to add capacity.
+    - Multiple FC layers with ReLU and dropout.
     """
-    def __init__(self, input_dim=512, num_classes=8, dropout=0.1):
+    def __init__(self, input_dim=512, num_classes=8, dropout=0.3):
         super().__init__()
-        self.fc = nn.Linear(input_dim, num_classes)
-        self.dropout = nn.Dropout(dropout)
+        self.fc1 = nn.Linear(input_dim, input_dim // 2)
+        self.dropout1 = nn.Dropout(dropout)
+        self.fc2 = nn.Linear(input_dim // 2, num_classes)
+        self.dropout2 = nn.Dropout(dropout)
 
     def forward(self, fused_embedding):
-        x = self.dropout(fused_embedding)
-        logits = self.fc(x)
+        x = F.relu(self.fc1(fused_embedding))
+        x = self.dropout1(x)
+        logits = self.fc2(x)
         probs = F.softmax(logits, dim=-1)
         return probs, logits
 
 # Example full model
 class MultimodalEmotionModel(nn.Module):
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=8):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=8, max_seq_len=101):
         super().__init__()
-        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim)
-        self.classifier = EmotionClassifier(fused_dim, num_classes)
+        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.3, max_seq_len=max_seq_len)
+        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.3)
 
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         fused, attn_weights = self.fusion(video_feats, audio_feats, mask=mask, return_attn=return_attn)
@@ -106,12 +109,29 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     audio_files = sorted(glob.glob(os.path.join(audio_feat_dir, '*.npy')))
 
     for v_file, a_file in zip(video_files, audio_files):
-        ## load video features numpy
+        basename = os.path.basename(v_file)
+        if '-' in basename:
+            # RAVDESS
+            parts = basename.split('-')
+            label_num = int(parts[2])
+            if label_num in [2, 8]:
+                continue
+            # Map to final labels: 01->0 (NEU), 03->1 (HAP), 04->2 (SAD), 05->3 (ANG), 06->4 (FEA), 07->5 (DIS)
+            ravdess_map = {1: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5}
+            label = ravdess_map[label_num]
+        else:
+            # CREMA-D
+            emotion = basename.split('_')[2]
+            cremad_map = {'ANG': 5, 'DIS': 7, 'FEA': 6, 'HAP': 3, 'NEU': 1, 'SAD': 4}
+            label_num = cremad_map[emotion]
+            # Map to final: 1->0 (NEU), 3->1 (HAP), 4->2 (SAD), 5->3 (ANG), 6->4 (FEA), 7->5 (DIS)
+            cremad_to_final = {1: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5}
+            label = cremad_to_final[label_num]
+        
+        # Load features
         v_feat = np.load(v_file)
         a_feat = np.load(a_file)
-        metadata = os.path.basename(v_file).split('_')[4]
-        label = int(metadata.split('-')[2]) - 1
-        video_features.append(torch.tensor(v_feat, dtype=torch.float32))  # Keep as list of tensors
+        video_features.append(torch.tensor(v_feat, dtype=torch.float32))
         audio_features.append(torch.tensor(a_feat, dtype=torch.float32))
         labels.append(label)
             
@@ -271,7 +291,12 @@ def train_model(model, train_loader, val_loader, test_loader, num_epochs=10, lr=
     # Save to JSON with hyperparameters in name
     results_name = f'results_bs{batch_size}_ep{num_epochs}_lr{lr}.json'
     with open(os.path.join('training_runs', results_name), 'w') as f:
-        json.dump(results, f, indent=4)
+        json.dump({
+            "training_progress": results,
+            "best_model": {
+                "epoch": best_epoch
+            }
+        }, f, indent=4)
     print(f"Training results saved to training_runs/{results_name}")
     
     # Save the best model (based on lowest validation loss)
