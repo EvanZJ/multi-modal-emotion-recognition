@@ -17,6 +17,25 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.utils.class_weight import compute_class_weight
 from datetime import datetime
 
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=2.0, alpha=None, reduction='mean'):
+        super().__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+        ce_loss = F.cross_entropy(inputs, targets, reduction='none')
+        pt = torch.exp(-ce_loss)
+        focal_loss = (1 - pt) ** self.gamma * ce_loss
+        if self.alpha is not None:
+            focal_loss = self.alpha[targets] * focal_loss
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        return focal_loss
+
 class CrossModalFusion(nn.Module):
     """
     Attention-based fusion module for video (sequence) and audio (global) features.
@@ -25,7 +44,7 @@ class CrossModalFusion(nn.Module):
     - Uses transformer layers to fuse them via self-attention.
     - Outputs fused embedding (pooled), and attention weights for interpretability.
     """
-    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.6, max_seq_len=101):
+    def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_layers=4, num_heads=8, dropout=0.01, max_seq_len=101):
         super().__init__()
         self.video_proj = nn.Linear(video_dim, fused_dim)
         self.audio_proj = nn.Linear(audio_dim, fused_dim)
@@ -91,7 +110,7 @@ class EmotionClassifier(nn.Module):
     Deeper classifier on top of fused embedding to add capacity.
     - Multiple FC layers with ReLU and dropout.
     """
-    def __init__(self, input_dim=512, num_classes=6, dropout=0.6):
+    def __init__(self, input_dim=512, num_classes=6, dropout=0.01):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, input_dim // 2)
         self.bn_fc1 = nn.BatchNorm1d(input_dim // 2)
@@ -114,8 +133,8 @@ class EmotionClassifier(nn.Module):
 class MultimodalEmotionModel(nn.Module):
     def __init__(self, video_dim=768, audio_dim=1024, fused_dim=512, num_classes=6, max_seq_len=101):
         super().__init__()
-        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.6, max_seq_len=max_seq_len)
-        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.6)
+        self.fusion = CrossModalFusion(video_dim, audio_dim, fused_dim, dropout=0.01, max_seq_len=max_seq_len)
+        self.classifier = EmotionClassifier(fused_dim, num_classes, dropout=0.01)
 
     def forward(self, video_feats, audio_feats, mask=None, return_attn=False):
         fused, attn_weights = self.fusion(video_feats, audio_feats, mask=mask, return_attn=return_attn)
@@ -153,6 +172,9 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
         # Load features
         v_feat = np.load(v_file)
         a_feat = np.load(a_file)
+        # Z-score normalization
+        v_feat = (v_feat - v_feat.mean(axis=0)) / (v_feat.std(axis=0) + 1e-6)
+        a_feat = (a_feat - a_feat.mean()) / (a_feat.std() + 1e-6)
         video_features.append(torch.tensor(v_feat, dtype=torch.float32))
         audio_features.append(torch.tensor(a_feat, dtype=torch.float32))
         labels.append(label)
@@ -222,13 +244,13 @@ def load_data(video_feat_dir, audio_feat_dir, batch_size=32):
     class_weights = torch.tensor(class_weights, dtype=torch.float32)
     
     return train_loader, val_loader, test_loader, max_chunks, class_weights
-    
 
-def train_model(model, train_loader, val_loader, test_loader, class_weights, num_epochs=10, lr=1e-4, weight_decay=2e-4, patience=100, batch_size=16, device='cuda'):
+def train_model(model, train_loader, val_loader, test_loader, class_weights, num_epochs=10, lr=1e-4, weight_decay=1e-4, patience=100, batch_size=16, device='cuda'):
     model.to(device)
-    criterion = nn.CrossEntropyLoss(weight=class_weights.to(device))  # Add class weights
+    # criterion = nn.CrossEntropyLoss(weight=class_weights.to(device))  # Add class weights
+    criterion = FocalLoss(gamma=2.0)  # Switch to Focal Loss; alpha=class_weights.to(device) if needed
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20, verbose=True)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=20)
     
     # Collect all hyperparameters
     hyperparameters = {
@@ -248,11 +270,12 @@ def train_model(model, train_loader, val_loader, test_loader, class_weights, num
         'num_layers': model.fusion.num_layers,
         'num_heads': model.fusion.num_heads,
         'scheduler_factor': 0.1,
-        'scheduler_patience': 20
+        'scheduler_patience': 10,
+        'focal_gamma': 2.0
     }
     
     results = []
-    best_val_loss = float('inf')
+    best_val_acc = 0.0
     best_model_state = None
     best_epoch = 0
     epochs_without_improvement = 0
@@ -308,8 +331,8 @@ def train_model(model, train_loader, val_loader, test_loader, class_weights, num
         scheduler.step(avg_val_loss)
         
         # Check if this is the best model
-        if avg_val_loss < best_val_loss:
-            best_val_loss = avg_val_loss
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
             best_model_state = model.state_dict().copy()
             best_epoch = epoch + 1
             epochs_without_improvement = 0
@@ -387,7 +410,7 @@ def train_model(model, train_loader, val_loader, test_loader, class_weights, num
     # Save the best model (based on lowest validation loss)
     best_model_name = f'best_model_bs{batch_size}_ep{num_epochs}_lr{lr}_{timestamp}.pth'
     torch.save(best_model_state, os.path.join('training_runs', best_model_name))
-    print(f"Best model (epoch {best_epoch}, val_loss {best_val_loss:.4f}) saved to training_runs/{best_model_name}")
+    print(f"Best model (epoch {best_epoch}, val_acc {best_val_acc:.4f}) saved to training_runs/{best_model_name}")
     
     # Save the final model
     final_model_name = f'final_model_bs{batch_size}_ep{num_epochs}_lr{lr}_{timestamp}.pth'
