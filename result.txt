@@ -1,0 +1,621 @@
+(Retin) E:\00 NTUST_STUDY\02 Semester 02 - 2025\IM6507701 Artificial Intelligence\Final project\multi>python train.py --batch_size 128 --num_epochs 100 --lr 1e-5 
+Example video/audio file pairs:
+1001_DFA_ANG_XX_faces_mp4_features.npy   <--->   1001_DFA_ANG_XX_voice_mp4_features.npy
+1001_DFA_DIS_XX_faces_mp4_features.npy   <--->   1001_DFA_DIS_XX_voice_mp4_features.npy
+1001_DFA_FEA_XX_faces_mp4_features.npy   <--->   1001_DFA_FEA_XX_voice_mp4_features.npy
+1001_DFA_HAP_XX_faces_mp4_features.npy   <--->   1001_DFA_HAP_XX_voice_mp4_features.npy
+1001_DFA_NEU_XX_faces_mp4_features.npy   <--->   1001_DFA_NEU_XX_voice_mp4_features.npy
+1001_DFA_SAD_XX_faces_mp4_features.npy   <--->   1001_DFA_SAD_XX_voice_mp4_features.npy
+1001_IEO_ANG_HI_faces_mp4_features.npy   <--->   1001_IEO_ANG_HI_voice_mp4_features.npy
+1001_IEO_ANG_LO_faces_mp4_features.npy   <--->   1001_IEO_ANG_LO_voice_mp4_features.npy
+1001_IEO_ANG_MD_faces_mp4_features.npy   <--->   1001_IEO_ANG_MD_voice_mp4_features.npy
+1001_IEO_DIS_HI_faces_mp4_features.npy   <--->   1001_IEO_DIS_HI_voice_mp4_features.npy
+Maximum number of video chunks: 56
+Train label distribution: Counter({1: 1170, 3: 1170, 2: 1170, 5: 1170, 4: 1170, 0: 947})
+Val label distribution: Counter({5: 147, 3: 147, 1: 146, 4: 146, 2: 146, 0: 118})
+Test label distribution: Counter({4: 147, 1: 147, 5: 146, 3: 146, 2: 146, 0: 118})
+Train samples: 6797, Val samples: 850, Test samples: 850
+C:\Users\PP\anaconda3\envs\Retin\lib\site-packages\torch\nn\modules\transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+C:\Users\PP\anaconda3\envs\Retin\lib\site-packages\torch\nn\functional.py:5476: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:263.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+Epoch 1/100, Train Loss: 1.8219, Val Loss: 1.7199, Val Acc: 25.29%
+Val Macro P/R/F1: 0.2691/0.2511/0.2213, Micro P/R/F1: 0.2529/0.2529/0.2529
+Test Acc: 27.41%, Test Macro P/R/F1: 0.3047/0.2710/0.2520, Micro P/R/F1: 0.2741/0.2741/0.2741
+Epoch 2/100, Train Loss: 1.7511, Val Loss: 1.6492, Val Acc: 32.24%
+Val Macro P/R/F1: 0.3286/0.3225/0.3121, Micro P/R/F1: 0.3224/0.3224/0.3224
+Test Acc: 34.00%, Test Macro P/R/F1: 0.3497/0.3424/0.3301, Micro P/R/F1: 0.3400/0.3400/0.3400
+Epoch 3/100, Train Loss: 1.6876, Val Loss: 1.5951, Val Acc: 37.29%
+Val Macro P/R/F1: 0.3772/0.3693/0.3591, Micro P/R/F1: 0.3729/0.3729/0.3729
+Test Acc: 37.06%, Test Macro P/R/F1: 0.3839/0.3677/0.3586, Micro P/R/F1: 0.3706/0.3706/0.3706
+Epoch 4/100, Train Loss: 1.6440, Val Loss: 1.5579, Val Acc: 39.29%
+Val Macro P/R/F1: 0.3953/0.3918/0.3872, Micro P/R/F1: 0.3929/0.3929/0.3929
+Test Acc: 39.18%, Test Macro P/R/F1: 0.3896/0.3920/0.3878, Micro P/R/F1: 0.3918/0.3918/0.3918
+Epoch 5/100, Train Loss: 1.5950, Val Loss: 1.5292, Val Acc: 40.24%
+Val Macro P/R/F1: 0.4020/0.4016/0.3942, Micro P/R/F1: 0.4024/0.4024/0.4024
+Test Acc: 40.24%, Test Macro P/R/F1: 0.3941/0.4032/0.3914, Micro P/R/F1: 0.4024/0.4024/0.4024
+Epoch 6/100, Train Loss: 1.5666, Val Loss: 1.5056, Val Acc: 42.12%
+Val Macro P/R/F1: 0.4188/0.4223/0.4141, Micro P/R/F1: 0.4212/0.4212/0.4212
+Test Acc: 40.47%, Test Macro P/R/F1: 0.3954/0.4073/0.3969, Micro P/R/F1: 0.4047/0.4047/0.4047
+Epoch 7/100, Train Loss: 1.5378, Val Loss: 1.4858, Val Acc: 42.82%
+Val Macro P/R/F1: 0.4234/0.4286/0.4220, Micro P/R/F1: 0.4282/0.4282/0.4282
+Test Acc: 41.88%, Test Macro P/R/F1: 0.4123/0.4204/0.4135, Micro P/R/F1: 0.4188/0.4188/0.4188
+Epoch 8/100, Train Loss: 1.5141, Val Loss: 1.4626, Val Acc: 43.65%
+Val Macro P/R/F1: 0.4347/0.4365/0.4286, Micro P/R/F1: 0.4365/0.4365/0.4365
+Test Acc: 42.47%, Test Macro P/R/F1: 0.4158/0.4258/0.4178, Micro P/R/F1: 0.4247/0.4247/0.4247
+Epoch 9/100, Train Loss: 1.4891, Val Loss: 1.4419, Val Acc: 45.65%
+Val Macro P/R/F1: 0.4534/0.4570/0.4524, Micro P/R/F1: 0.4565/0.4565/0.4565
+Test Acc: 45.06%, Test Macro P/R/F1: 0.4445/0.4514/0.4464, Micro P/R/F1: 0.4506/0.4506/0.4506
+Epoch 10/100, Train Loss: 1.4594, Val Loss: 1.4216, Val Acc: 45.29%
+Val Macro P/R/F1: 0.4510/0.4544/0.4477, Micro P/R/F1: 0.4529/0.4529/0.4529
+Test Acc: 44.94%, Test Macro P/R/F1: 0.4450/0.4519/0.4451, Micro P/R/F1: 0.4494/0.4494/0.4494
+Epoch 11/100, Train Loss: 1.4379, Val Loss: 1.4046, Val Acc: 46.82%
+Val Macro P/R/F1: 0.4664/0.4692/0.4652, Micro P/R/F1: 0.4682/0.4682/0.4682
+Test Acc: 45.88%, Test Macro P/R/F1: 0.4548/0.4602/0.4548, Micro P/R/F1: 0.4588/0.4588/0.4588
+Epoch 12/100, Train Loss: 1.4273, Val Loss: 1.3937, Val Acc: 46.35%
+Val Macro P/R/F1: 0.4599/0.4652/0.4607, Micro P/R/F1: 0.4635/0.4635/0.4635
+Test Acc: 47.06%, Test Macro P/R/F1: 0.4638/0.4730/0.4655, Micro P/R/F1: 0.4706/0.4706/0.4706
+Epoch 13/100, Train Loss: 1.3897, Val Loss: 1.3735, Val Acc: 48.12%
+Val Macro P/R/F1: 0.4784/0.4842/0.4773, Micro P/R/F1: 0.4812/0.4812/0.4812
+Test Acc: 47.18%, Test Macro P/R/F1: 0.4652/0.4752/0.4667, Micro P/R/F1: 0.4718/0.4718/0.4718
+Epoch 14/100, Train Loss: 1.3722, Val Loss: 1.3621, Val Acc: 49.88%
+Val Macro P/R/F1: 0.4968/0.5001/0.4926, Micro P/R/F1: 0.4988/0.4988/0.4988
+Test Acc: 47.76%, Test Macro P/R/F1: 0.4702/0.4801/0.4677, Micro P/R/F1: 0.4776/0.4776/0.4776
+Epoch 15/100, Train Loss: 1.3616, Val Loss: 1.3454, Val Acc: 50.00%
+Val Macro P/R/F1: 0.4974/0.5008/0.4945, Micro P/R/F1: 0.5000/0.5000/0.5000
+Test Acc: 48.24%, Test Macro P/R/F1: 0.4759/0.4843/0.4747, Micro P/R/F1: 0.4824/0.4824/0.4824
+Epoch 16/100, Train Loss: 1.3423, Val Loss: 1.3341, Val Acc: 50.82%
+Val Macro P/R/F1: 0.5059/0.5101/0.5044, Micro P/R/F1: 0.5082/0.5082/0.5082
+Test Acc: 49.88%, Test Macro P/R/F1: 0.4944/0.5016/0.4942, Micro P/R/F1: 0.4988/0.4988/0.4988
+Epoch 17/100, Train Loss: 1.3218, Val Loss: 1.3219, Val Acc: 50.82%
+Val Macro P/R/F1: 0.5082/0.5093/0.5051, Micro P/R/F1: 0.5082/0.5082/0.5082
+Test Acc: 50.24%, Test Macro P/R/F1: 0.4977/0.5043/0.4961, Micro P/R/F1: 0.5024/0.5024/0.5024
+Epoch 18/100, Train Loss: 1.2972, Val Loss: 1.3102, Val Acc: 52.59%
+Val Macro P/R/F1: 0.5251/0.5263/0.5241, Micro P/R/F1: 0.5259/0.5259/0.5259
+Test Acc: 50.12%, Test Macro P/R/F1: 0.4971/0.5033/0.4981, Micro P/R/F1: 0.5012/0.5012/0.5012
+Epoch 19/100, Train Loss: 1.2853, Val Loss: 1.2945, Val Acc: 51.53%
+Val Macro P/R/F1: 0.5169/0.5169/0.5129, Micro P/R/F1: 0.5153/0.5153/0.5153
+Test Acc: 50.71%, Test Macro P/R/F1: 0.5060/0.5101/0.5041, Micro P/R/F1: 0.5071/0.5071/0.5071
+Epoch 20/100, Train Loss: 1.2636, Val Loss: 1.2945, Val Acc: 52.24%
+Val Macro P/R/F1: 0.5262/0.5243/0.5214, Micro P/R/F1: 0.5224/0.5224/0.5224
+Test Acc: 50.94%, Test Macro P/R/F1: 0.5126/0.5115/0.5076, Micro P/R/F1: 0.5094/0.5094/0.5094
+Epoch 21/100, Train Loss: 1.2577, Val Loss: 1.2876, Val Acc: 53.06%
+Val Macro P/R/F1: 0.5304/0.5336/0.5279, Micro P/R/F1: 0.5306/0.5306/0.5306
+Test Acc: 51.53%, Test Macro P/R/F1: 0.5123/0.5184/0.5103, Micro P/R/F1: 0.5153/0.5153/0.5153
+Epoch 22/100, Train Loss: 1.2364, Val Loss: 1.2675, Val Acc: 53.29%
+Val Macro P/R/F1: 0.5345/0.5353/0.5321, Micro P/R/F1: 0.5329/0.5329/0.5329
+Test Acc: 52.59%, Test Macro P/R/F1: 0.5255/0.5292/0.5239, Micro P/R/F1: 0.5259/0.5259/0.5259
+Epoch 23/100, Train Loss: 1.2234, Val Loss: 1.2554, Val Acc: 53.18%
+Val Macro P/R/F1: 0.5323/0.5355/0.5285, Micro P/R/F1: 0.5318/0.5318/0.5318
+Test Acc: 52.00%, Test Macro P/R/F1: 0.5168/0.5240/0.5154, Micro P/R/F1: 0.5200/0.5200/0.5200
+Epoch 24/100, Train Loss: 1.2049, Val Loss: 1.2579, Val Acc: 53.65%
+Val Macro P/R/F1: 0.5400/0.5385/0.5353, Micro P/R/F1: 0.5365/0.5365/0.5365
+Test Acc: 53.18%, Test Macro P/R/F1: 0.5350/0.5346/0.5297, Micro P/R/F1: 0.5318/0.5318/0.5318
+Epoch 25/100, Train Loss: 1.1948, Val Loss: 1.2442, Val Acc: 54.24%
+Val Macro P/R/F1: 0.5461/0.5455/0.5423, Micro P/R/F1: 0.5424/0.5424/0.5424
+Test Acc: 53.88%, Test Macro P/R/F1: 0.5410/0.5419/0.5382, Micro P/R/F1: 0.5388/0.5388/0.5388
+Epoch 26/100, Train Loss: 1.1851, Val Loss: 1.2402, Val Acc: 54.47%
+Val Macro P/R/F1: 0.5468/0.5481/0.5430, Micro P/R/F1: 0.5447/0.5447/0.5447
+Test Acc: 52.94%, Test Macro P/R/F1: 0.5297/0.5336/0.5277, Micro P/R/F1: 0.5294/0.5294/0.5294
+Epoch 27/100, Train Loss: 1.1549, Val Loss: 1.2248, Val Acc: 53.76%
+Val Macro P/R/F1: 0.5370/0.5396/0.5361, Micro P/R/F1: 0.5376/0.5376/0.5376
+Test Acc: 54.59%, Test Macro P/R/F1: 0.5464/0.5490/0.5442, Micro P/R/F1: 0.5459/0.5459/0.5459
+Epoch 28/100, Train Loss: 1.1453, Val Loss: 1.2215, Val Acc: 56.00%
+Val Macro P/R/F1: 0.5620/0.5637/0.5584, Micro P/R/F1: 0.5600/0.5600/0.5600
+Test Acc: 53.88%, Test Macro P/R/F1: 0.5386/0.5422/0.5375, Micro P/R/F1: 0.5388/0.5388/0.5388
+Epoch 29/100, Train Loss: 1.1360, Val Loss: 1.2184, Val Acc: 55.65%
+Val Macro P/R/F1: 0.5614/0.5587/0.5554, Micro P/R/F1: 0.5565/0.5565/0.5565
+Test Acc: 53.76%, Test Macro P/R/F1: 0.5402/0.5400/0.5359, Micro P/R/F1: 0.5376/0.5376/0.5376
+Epoch 30/100, Train Loss: 1.1174, Val Loss: 1.2051, Val Acc: 55.65%
+Val Macro P/R/F1: 0.5583/0.5589/0.5551, Micro P/R/F1: 0.5565/0.5565/0.5565
+Test Acc: 55.06%, Test Macro P/R/F1: 0.5524/0.5536/0.5494, Micro P/R/F1: 0.5506/0.5506/0.5506
+Epoch 31/100, Train Loss: 1.1086, Val Loss: 1.2095, Val Acc: 56.47%
+Val Macro P/R/F1: 0.5677/0.5691/0.5621, Micro P/R/F1: 0.5647/0.5647/0.5647
+Test Acc: 55.29%, Test Macro P/R/F1: 0.5543/0.5567/0.5513, Micro P/R/F1: 0.5529/0.5529/0.5529
+Epoch 32/100, Train Loss: 1.0968, Val Loss: 1.1941, Val Acc: 56.35%
+Val Macro P/R/F1: 0.5653/0.5655/0.5626, Micro P/R/F1: 0.5635/0.5635/0.5635
+Test Acc: 55.29%, Test Macro P/R/F1: 0.5557/0.5555/0.5528, Micro P/R/F1: 0.5529/0.5529/0.5529
+Epoch 33/100, Train Loss: 1.0772, Val Loss: 1.1852, Val Acc: 56.82%
+Val Macro P/R/F1: 0.5726/0.5714/0.5673, Micro P/R/F1: 0.5682/0.5682/0.5682
+Test Acc: 55.76%, Test Macro P/R/F1: 0.5602/0.5609/0.5567, Micro P/R/F1: 0.5576/0.5576/0.5576
+Epoch 34/100, Train Loss: 1.0789, Val Loss: 1.1733, Val Acc: 57.65%
+Val Macro P/R/F1: 0.5797/0.5800/0.5757, Micro P/R/F1: 0.5765/0.5765/0.5765
+Test Acc: 56.12%, Test Macro P/R/F1: 0.5631/0.5651/0.5607, Micro P/R/F1: 0.5612/0.5612/0.5612
+Epoch 35/100, Train Loss: 1.0580, Val Loss: 1.1706, Val Acc: 57.29%
+Val Macro P/R/F1: 0.5789/0.5749/0.5733, Micro P/R/F1: 0.5729/0.5729/0.5729
+Test Acc: 56.35%, Test Macro P/R/F1: 0.5719/0.5660/0.5651, Micro P/R/F1: 0.5635/0.5635/0.5635
+Epoch 36/100, Train Loss: 1.0500, Val Loss: 1.1687, Val Acc: 57.88%
+Val Macro P/R/F1: 0.5853/0.5809/0.5785, Micro P/R/F1: 0.5788/0.5788/0.5788
+Test Acc: 57.88%, Test Macro P/R/F1: 0.5868/0.5811/0.5794, Micro P/R/F1: 0.5788/0.5788/0.5788
+Epoch 37/100, Train Loss: 1.0353, Val Loss: 1.1531, Val Acc: 57.76%
+Val Macro P/R/F1: 0.5799/0.5800/0.5773, Micro P/R/F1: 0.5776/0.5776/0.5776
+Test Acc: 57.53%, Test Macro P/R/F1: 0.5794/0.5791/0.5756, Micro P/R/F1: 0.5753/0.5753/0.5753
+Epoch 38/100, Train Loss: 1.0054, Val Loss: 1.1697, Val Acc: 56.82%
+Val Macro P/R/F1: 0.5696/0.5723/0.5679, Micro P/R/F1: 0.5682/0.5682/0.5682
+Test Acc: 56.94%, Test Macro P/R/F1: 0.5707/0.5717/0.5702, Micro P/R/F1: 0.5694/0.5694/0.5694
+Epoch 39/100, Train Loss: 1.0005, Val Loss: 1.1533, Val Acc: 58.71%
+Val Macro P/R/F1: 0.5892/0.5893/0.5867, Micro P/R/F1: 0.5871/0.5871/0.5871
+Test Acc: 58.12%, Test Macro P/R/F1: 0.5846/0.5848/0.5816, Micro P/R/F1: 0.5812/0.5812/0.5812
+Epoch 40/100, Train Loss: 0.9866, Val Loss: 1.1433, Val Acc: 59.65%
+Val Macro P/R/F1: 0.6041/0.5990/0.5965, Micro P/R/F1: 0.5965/0.5965/0.5965
+Test Acc: 58.24%, Test Macro P/R/F1: 0.5892/0.5856/0.5821, Micro P/R/F1: 0.5824/0.5824/0.5824
+Epoch 41/100, Train Loss: 0.9784, Val Loss: 1.1281, Val Acc: 59.18%
+Val Macro P/R/F1: 0.5965/0.5941/0.5918, Micro P/R/F1: 0.5918/0.5918/0.5918
+Test Acc: 58.35%, Test Macro P/R/F1: 0.5884/0.5853/0.5847, Micro P/R/F1: 0.5835/0.5835/0.5835
+Epoch 42/100, Train Loss: 0.9670, Val Loss: 1.1256, Val Acc: 60.00%
+Val Macro P/R/F1: 0.6086/0.6027/0.5996, Micro P/R/F1: 0.6000/0.6000/0.6000
+Test Acc: 59.06%, Test Macro P/R/F1: 0.5975/0.5949/0.5912, Micro P/R/F1: 0.5906/0.5906/0.5906
+Epoch 43/100, Train Loss: 0.9588, Val Loss: 1.1289, Val Acc: 59.65%
+Val Macro P/R/F1: 0.6031/0.5985/0.5959, Micro P/R/F1: 0.5965/0.5965/0.5965
+Test Acc: 59.53%, Test Macro P/R/F1: 0.6015/0.5978/0.5964, Micro P/R/F1: 0.5953/0.5953/0.5953
+Epoch 44/100, Train Loss: 0.9465, Val Loss: 1.1158, Val Acc: 59.88%
+Val Macro P/R/F1: 0.6056/0.6016/0.5984, Micro P/R/F1: 0.5988/0.5988/0.5988
+Test Acc: 60.00%, Test Macro P/R/F1: 0.6038/0.6041/0.6009, Micro P/R/F1: 0.6000/0.6000/0.6000
+Epoch 45/100, Train Loss: 0.9286, Val Loss: 1.1207, Val Acc: 60.24%
+Val Macro P/R/F1: 0.6059/0.6044/0.6030, Micro P/R/F1: 0.6024/0.6024/0.6024
+Test Acc: 59.29%, Test Macro P/R/F1: 0.5971/0.5961/0.5939, Micro P/R/F1: 0.5929/0.5929/0.5929
+Epoch 46/100, Train Loss: 0.9297, Val Loss: 1.1015, Val Acc: 61.41%
+Val Macro P/R/F1: 0.6183/0.6152/0.6135, Micro P/R/F1: 0.6141/0.6141/0.6141
+Test Acc: 60.59%, Test Macro P/R/F1: 0.6070/0.6092/0.6062, Micro P/R/F1: 0.6059/0.6059/0.6059
+Epoch 47/100, Train Loss: 0.9171, Val Loss: 1.0950, Val Acc: 61.41%
+Val Macro P/R/F1: 0.6168/0.6155/0.6132, Micro P/R/F1: 0.6141/0.6141/0.6141
+Test Acc: 60.71%, Test Macro P/R/F1: 0.6096/0.6095/0.6081, Micro P/R/F1: 0.6071/0.6071/0.6071
+Epoch 48/100, Train Loss: 0.9094, Val Loss: 1.1325, Val Acc: 59.88%
+Val Macro P/R/F1: 0.6021/0.6007/0.5983, Micro P/R/F1: 0.5988/0.5988/0.5988
+Test Acc: 61.18%, Test Macro P/R/F1: 0.6143/0.6163/0.6125, Micro P/R/F1: 0.6118/0.6118/0.6118
+Epoch 49/100, Train Loss: 0.9068, Val Loss: 1.1040, Val Acc: 61.18%
+Val Macro P/R/F1: 0.6176/0.6141/0.6126, Micro P/R/F1: 0.6118/0.6118/0.6118
+Test Acc: 60.94%, Test Macro P/R/F1: 0.6145/0.6126/0.6117, Micro P/R/F1: 0.6094/0.6094/0.6094
+Epoch 50/100, Train Loss: 0.8947, Val Loss: 1.0875, Val Acc: 61.65%
+Val Macro P/R/F1: 0.6227/0.6181/0.6172, Micro P/R/F1: 0.6165/0.6165/0.6165
+Test Acc: 60.94%, Test Macro P/R/F1: 0.6140/0.6128/0.6115, Micro P/R/F1: 0.6094/0.6094/0.6094
+Epoch 51/100, Train Loss: 0.8843, Val Loss: 1.0924, Val Acc: 59.41%
+Val Macro P/R/F1: 0.6022/0.5962/0.5946, Micro P/R/F1: 0.5941/0.5941/0.5941
+Test Acc: 61.65%, Test Macro P/R/F1: 0.6215/0.6186/0.6177, Micro P/R/F1: 0.6165/0.6165/0.6165
+Epoch 52/100, Train Loss: 0.8703, Val Loss: 1.0920, Val Acc: 62.12%
+Val Macro P/R/F1: 0.6304/0.6229/0.6220, Micro P/R/F1: 0.6212/0.6212/0.6212
+Test Acc: 62.00%, Test Macro P/R/F1: 0.6290/0.6234/0.6230, Micro P/R/F1: 0.6200/0.6200/0.6200
+Epoch 53/100, Train Loss: 0.8575, Val Loss: 1.0696, Val Acc: 61.88%
+Val Macro P/R/F1: 0.6230/0.6206/0.6194, Micro P/R/F1: 0.6188/0.6188/0.6188
+Test Acc: 62.71%, Test Macro P/R/F1: 0.6304/0.6299/0.6291, Micro P/R/F1: 0.6271/0.6271/0.6271
+Epoch 54/100, Train Loss: 0.8509, Val Loss: 1.0856, Val Acc: 62.35%
+Val Macro P/R/F1: 0.6282/0.6247/0.6236, Micro P/R/F1: 0.6235/0.6235/0.6235
+Test Acc: 62.47%, Test Macro P/R/F1: 0.6298/0.6284/0.6270, Micro P/R/F1: 0.6247/0.6247/0.6247
+Epoch 55/100, Train Loss: 0.8485, Val Loss: 1.0714, Val Acc: 61.29%
+Val Macro P/R/F1: 0.6231/0.6144/0.6150, Micro P/R/F1: 0.6129/0.6129/0.6129
+Test Acc: 62.71%, Test Macro P/R/F1: 0.6367/0.6299/0.6305, Micro P/R/F1: 0.6271/0.6271/0.6271
+Epoch 56/100, Train Loss: 0.8331, Val Loss: 1.0732, Val Acc: 62.12%
+Val Macro P/R/F1: 0.6241/0.6221/0.6216, Micro P/R/F1: 0.6212/0.6212/0.6212
+Test Acc: 62.35%, Test Macro P/R/F1: 0.6263/0.6259/0.6253, Micro P/R/F1: 0.6235/0.6235/0.6235
+Epoch 57/100, Train Loss: 0.8255, Val Loss: 1.0580, Val Acc: 62.59%
+Val Macro P/R/F1: 0.6298/0.6281/0.6266, Micro P/R/F1: 0.6259/0.6259/0.6259
+Test Acc: 62.12%, Test Macro P/R/F1: 0.6243/0.6248/0.6227, Micro P/R/F1: 0.6212/0.6212/0.6212
+Epoch 58/100, Train Loss: 0.8140, Val Loss: 1.0686, Val Acc: 61.65%
+Val Macro P/R/F1: 0.6246/0.6175/0.6170, Micro P/R/F1: 0.6165/0.6165/0.6165
+Test Acc: 63.65%, Test Macro P/R/F1: 0.6450/0.6395/0.6399, Micro P/R/F1: 0.6365/0.6365/0.6365
+Epoch 59/100, Train Loss: 0.8076, Val Loss: 1.0652, Val Acc: 62.35%
+Val Macro P/R/F1: 0.6287/0.6255/0.6246, Micro P/R/F1: 0.6235/0.6235/0.6235
+Test Acc: 62.24%, Test Macro P/R/F1: 0.6254/0.6259/0.6247, Micro P/R/F1: 0.6224/0.6224/0.6224
+Epoch 60/100, Train Loss: 0.7975, Val Loss: 1.0553, Val Acc: 62.94%
+Val Macro P/R/F1: 0.6336/0.6298/0.6301, Micro P/R/F1: 0.6294/0.6294/0.6294
+Test Acc: 64.71%, Test Macro P/R/F1: 0.6531/0.6492/0.6496, Micro P/R/F1: 0.6471/0.6471/0.6471
+Epoch 61/100, Train Loss: 0.7852, Val Loss: 1.0775, Val Acc: 62.24%
+Val Macro P/R/F1: 0.6320/0.6240/0.6234, Micro P/R/F1: 0.6224/0.6224/0.6224
+Test Acc: 63.53%, Test Macro P/R/F1: 0.6442/0.6390/0.6384, Micro P/R/F1: 0.6353/0.6353/0.6353
+Epoch 62/100, Train Loss: 0.7961, Val Loss: 1.0655, Val Acc: 63.76%
+Val Macro P/R/F1: 0.6443/0.6383/0.6382, Micro P/R/F1: 0.6376/0.6376/0.6376
+Test Acc: 64.12%, Test Macro P/R/F1: 0.6484/0.6435/0.6437, Micro P/R/F1: 0.6412/0.6412/0.6412
+Epoch 63/100, Train Loss: 0.7869, Val Loss: 1.0429, Val Acc: 62.71%
+Val Macro P/R/F1: 0.6332/0.6272/0.6277, Micro P/R/F1: 0.6271/0.6271/0.6271
+Test Acc: 64.12%, Test Macro P/R/F1: 0.6479/0.6435/0.6439, Micro P/R/F1: 0.6412/0.6412/0.6412
+Epoch 64/100, Train Loss: 0.7715, Val Loss: 1.0453, Val Acc: 63.06%
+Val Macro P/R/F1: 0.6333/0.6315/0.6308, Micro P/R/F1: 0.6306/0.6306/0.6306
+Test Acc: 64.94%, Test Macro P/R/F1: 0.6527/0.6521/0.6515, Micro P/R/F1: 0.6494/0.6494/0.6494
+Epoch 65/100, Train Loss: 0.7628, Val Loss: 1.0553, Val Acc: 64.00%
+Val Macro P/R/F1: 0.6449/0.6403/0.6401, Micro P/R/F1: 0.6400/0.6400/0.6400
+Test Acc: 64.12%, Test Macro P/R/F1: 0.6475/0.6441/0.6445, Micro P/R/F1: 0.6412/0.6412/0.6412
+Epoch 66/100, Train Loss: 0.7408, Val Loss: 1.0479, Val Acc: 63.06%
+Val Macro P/R/F1: 0.6369/0.6312/0.6316, Micro P/R/F1: 0.6306/0.6306/0.6306
+Test Acc: 63.53%, Test Macro P/R/F1: 0.6406/0.6370/0.6372, Micro P/R/F1: 0.6353/0.6353/0.6353
+Epoch 67/100, Train Loss: 0.7524, Val Loss: 1.0519, Val Acc: 63.41%
+Val Macro P/R/F1: 0.6453/0.6354/0.6349, Micro P/R/F1: 0.6341/0.6341/0.6341
+Test Acc: 64.35%, Test Macro P/R/F1: 0.6506/0.6467/0.6454, Micro P/R/F1: 0.6435/0.6435/0.6435
+Epoch 68/100, Train Loss: 0.7314, Val Loss: 1.0460, Val Acc: 63.18%
+Val Macro P/R/F1: 0.6403/0.6326/0.6329, Micro P/R/F1: 0.6318/0.6318/0.6318
+Test Acc: 65.53%, Test Macro P/R/F1: 0.6649/0.6588/0.6590, Micro P/R/F1: 0.6553/0.6553/0.6553
+Epoch 69/100, Train Loss: 0.7347, Val Loss: 1.0331, Val Acc: 64.35%
+Val Macro P/R/F1: 0.6504/0.6443/0.6449, Micro P/R/F1: 0.6435/0.6435/0.6435
+Test Acc: 65.29%, Test Macro P/R/F1: 0.6582/0.6555/0.6560, Micro P/R/F1: 0.6529/0.6529/0.6529
+Epoch 70/100, Train Loss: 0.7222, Val Loss: 1.0595, Val Acc: 64.24%
+Val Macro P/R/F1: 0.6498/0.6440/0.6440, Micro P/R/F1: 0.6424/0.6424/0.6424
+Test Acc: 65.65%, Test Macro P/R/F1: 0.6658/0.6603/0.6602, Micro P/R/F1: 0.6565/0.6565/0.6565
+Epoch 71/100, Train Loss: 0.7084, Val Loss: 1.0343, Val Acc: 64.00%
+Val Macro P/R/F1: 0.6441/0.6414/0.6406, Micro P/R/F1: 0.6400/0.6400/0.6400
+Test Acc: 66.59%, Test Macro P/R/F1: 0.6693/0.6699/0.6684, Micro P/R/F1: 0.6659/0.6659/0.6659
+Epoch 72/100, Train Loss: 0.7073, Val Loss: 1.0394, Val Acc: 64.24%
+Val Macro P/R/F1: 0.6527/0.6442/0.6440, Micro P/R/F1: 0.6424/0.6424/0.6424
+Test Acc: 64.82%, Test Macro P/R/F1: 0.6573/0.6518/0.6517, Micro P/R/F1: 0.6482/0.6482/0.6482
+Epoch 73/100, Train Loss: 0.7101, Val Loss: 1.0297, Val Acc: 64.35%
+Val Macro P/R/F1: 0.6463/0.6445/0.6430, Micro P/R/F1: 0.6435/0.6435/0.6435
+Test Acc: 65.65%, Test Macro P/R/F1: 0.6573/0.6602/0.6575, Micro P/R/F1: 0.6565/0.6565/0.6565
+Epoch 74/100, Train Loss: 0.6935, Val Loss: 1.0240, Val Acc: 65.06%
+Val Macro P/R/F1: 0.6585/0.6517/0.6517, Micro P/R/F1: 0.6506/0.6506/0.6506
+Test Acc: 65.76%, Test Macro P/R/F1: 0.6628/0.6606/0.6601, Micro P/R/F1: 0.6576/0.6576/0.6576
+Epoch 75/100, Train Loss: 0.6802, Val Loss: 1.0335, Val Acc: 63.29%
+Val Macro P/R/F1: 0.6372/0.6340/0.6337, Micro P/R/F1: 0.6329/0.6329/0.6329
+Test Acc: 66.00%, Test Macro P/R/F1: 0.6634/0.6631/0.6621, Micro P/R/F1: 0.6600/0.6600/0.6600
+Epoch 76/100, Train Loss: 0.6735, Val Loss: 1.0196, Val Acc: 64.35%
+Val Macro P/R/F1: 0.6469/0.6454/0.6444, Micro P/R/F1: 0.6435/0.6435/0.6435
+Test Acc: 65.41%, Test Macro P/R/F1: 0.6582/0.6572/0.6565, Micro P/R/F1: 0.6541/0.6541/0.6541
+Epoch 77/100, Train Loss: 0.6625, Val Loss: 1.0298, Val Acc: 64.00%
+Val Macro P/R/F1: 0.6461/0.6419/0.6412, Micro P/R/F1: 0.6400/0.6400/0.6400
+Test Acc: 65.76%, Test Macro P/R/F1: 0.6629/0.6611/0.6604, Micro P/R/F1: 0.6576/0.6576/0.6576
+Epoch 78/100, Train Loss: 0.6609, Val Loss: 1.0104, Val Acc: 64.24%
+Val Macro P/R/F1: 0.6512/0.6442/0.6443, Micro P/R/F1: 0.6424/0.6424/0.6424
+Test Acc: 66.24%, Test Macro P/R/F1: 0.6679/0.6660/0.6650, Micro P/R/F1: 0.6624/0.6624/0.6624
+Epoch 79/100, Train Loss: 0.6679, Val Loss: 1.0243, Val Acc: 64.71%
+Val Macro P/R/F1: 0.6571/0.6480/0.6485, Micro P/R/F1: 0.6471/0.6471/0.6471
+Test Acc: 67.41%, Test Macro P/R/F1: 0.6785/0.6776/0.6766, Micro P/R/F1: 0.6741/0.6741/0.6741
+Epoch 80/100, Train Loss: 0.6532, Val Loss: 1.0289, Val Acc: 64.59%
+Val Macro P/R/F1: 0.6487/0.6463/0.6464, Micro P/R/F1: 0.6459/0.6459/0.6459
+Test Acc: 66.00%, Test Macro P/R/F1: 0.6637/0.6629/0.6625, Micro P/R/F1: 0.6600/0.6600/0.6600
+Epoch 81/100, Train Loss: 0.6414, Val Loss: 1.0292, Val Acc: 65.53%
+Val Macro P/R/F1: 0.6644/0.6565/0.6568, Micro P/R/F1: 0.6553/0.6553/0.6553
+Test Acc: 65.88%, Test Macro P/R/F1: 0.6667/0.6620/0.6619, Micro P/R/F1: 0.6588/0.6588/0.6588
+Epoch 82/100, Train Loss: 0.6411, Val Loss: 1.0380, Val Acc: 65.06%
+Val Macro P/R/F1: 0.6675/0.6509/0.6523, Micro P/R/F1: 0.6506/0.6506/0.6506
+Test Acc: 65.76%, Test Macro P/R/F1: 0.6690/0.6606/0.6621, Micro P/R/F1: 0.6576/0.6576/0.6576
+Epoch 83/100, Train Loss: 0.6469, Val Loss: 1.0276, Val Acc: 65.76%
+Val Macro P/R/F1: 0.6658/0.6585/0.6587, Micro P/R/F1: 0.6576/0.6576/0.6576
+Test Acc: 66.24%, Test Macro P/R/F1: 0.6699/0.6665/0.6657, Micro P/R/F1: 0.6624/0.6624/0.6624
+Epoch 84/100, Train Loss: 0.6244, Val Loss: 1.0181, Val Acc: 64.82%
+Val Macro P/R/F1: 0.6557/0.6499/0.6496, Micro P/R/F1: 0.6482/0.6482/0.6482
+Test Acc: 65.88%, Test Macro P/R/F1: 0.6655/0.6620/0.6618, Micro P/R/F1: 0.6588/0.6588/0.6588
+Epoch 85/100, Train Loss: 0.5984, Val Loss: 1.0144, Val Acc: 65.29%
+Val Macro P/R/F1: 0.6583/0.6539/0.6540, Micro P/R/F1: 0.6529/0.6529/0.6529
+Test Acc: 67.41%, Test Macro P/R/F1: 0.6790/0.6771/0.6767, Micro P/R/F1: 0.6741/0.6741/0.6741
+Epoch 86/100, Train Loss: 0.5960, Val Loss: 1.0169, Val Acc: 64.82%
+Val Macro P/R/F1: 0.6556/0.6494/0.6499, Micro P/R/F1: 0.6482/0.6482/0.6482
+Test Acc: 66.94%, Test Macro P/R/F1: 0.6754/0.6725/0.6722, Micro P/R/F1: 0.6694/0.6694/0.6694
+Epoch 87/100, Train Loss: 0.6012, Val Loss: 1.0122, Val Acc: 64.94%
+Val Macro P/R/F1: 0.6596/0.6508/0.6513, Micro P/R/F1: 0.6494/0.6494/0.6494
+Test Acc: 67.06%, Test Macro P/R/F1: 0.6779/0.6737/0.6734, Micro P/R/F1: 0.6706/0.6706/0.6706
+Epoch 88/100, Train Loss: 0.5865, Val Loss: 1.0011, Val Acc: 65.53%
+Val Macro P/R/F1: 0.6612/0.6565/0.6566, Micro P/R/F1: 0.6553/0.6553/0.6553
+Test Acc: 67.41%, Test Macro P/R/F1: 0.6801/0.6762/0.6765, Micro P/R/F1: 0.6741/0.6741/0.6741
+Epoch 89/100, Train Loss: 0.5896, Val Loss: 1.0068, Val Acc: 65.53%
+Val Macro P/R/F1: 0.6615/0.6568/0.6566, Micro P/R/F1: 0.6553/0.6553/0.6553
+Test Acc: 66.82%, Test Macro P/R/F1: 0.6740/0.6719/0.6708, Micro P/R/F1: 0.6682/0.6682/0.6682
+Epoch 90/100, Train Loss: 0.5860, Val Loss: 1.0026, Val Acc: 65.88%
+Val Macro P/R/F1: 0.6700/0.6599/0.6613, Micro P/R/F1: 0.6588/0.6588/0.6588
+Test Acc: 67.18%, Test Macro P/R/F1: 0.6804/0.6745/0.6756, Micro P/R/F1: 0.6718/0.6718/0.6718
+Epoch 91/100, Train Loss: 0.5762, Val Loss: 1.0047, Val Acc: 66.12%
+Val Macro P/R/F1: 0.6687/0.6625/0.6627, Micro P/R/F1: 0.6612/0.6612/0.6612
+Test Acc: 67.06%, Test Macro P/R/F1: 0.6764/0.6739/0.6734, Micro P/R/F1: 0.6706/0.6706/0.6706
+Epoch 92/100, Train Loss: 0.5836, Val Loss: 0.9926, Val Acc: 65.76%
+Val Macro P/R/F1: 0.6616/0.6590/0.6584, Micro P/R/F1: 0.6576/0.6576/0.6576
+Test Acc: 66.94%, Test Macro P/R/F1: 0.6723/0.6725/0.6711, Micro P/R/F1: 0.6694/0.6694/0.6694
+Epoch 93/100, Train Loss: 0.5860, Val Loss: 1.0091, Val Acc: 66.47%
+Val Macro P/R/F1: 0.6736/0.6661/0.6664, Micro P/R/F1: 0.6647/0.6647/0.6647
+Test Acc: 67.18%, Test Macro P/R/F1: 0.6778/0.6745/0.6742, Micro P/R/F1: 0.6718/0.6718/0.6718
+Epoch 94/100, Train Loss: 0.5810, Val Loss: 0.9972, Val Acc: 65.76%
+Val Macro P/R/F1: 0.6654/0.6590/0.6591, Micro P/R/F1: 0.6576/0.6576/0.6576
+Test Acc: 67.29%, Test Macro P/R/F1: 0.6788/0.6754/0.6752, Micro P/R/F1: 0.6729/0.6729/0.6729
+Epoch 95/100, Train Loss: 0.5669, Val Loss: 1.0024, Val Acc: 66.12%
+Val Macro P/R/F1: 0.6691/0.6622/0.6623, Micro P/R/F1: 0.6612/0.6612/0.6612
+Test Acc: 67.18%, Test Macro P/R/F1: 0.6787/0.6740/0.6743, Micro P/R/F1: 0.6718/0.6718/0.6718
+Epoch 96/100, Train Loss: 0.5778, Val Loss: 1.0159, Val Acc: 66.24%
+Val Macro P/R/F1: 0.6671/0.6633/0.6633, Micro P/R/F1: 0.6624/0.6624/0.6624
+Test Acc: 67.18%, Test Macro P/R/F1: 0.6783/0.6753/0.6749, Micro P/R/F1: 0.6718/0.6718/0.6718
+Epoch 97/100, Train Loss: 0.5794, Val Loss: 1.0042, Val Acc: 66.12%
+Val Macro P/R/F1: 0.6688/0.6622/0.6627, Micro P/R/F1: 0.6612/0.6612/0.6612
+Test Acc: 67.65%, Test Macro P/R/F1: 0.6826/0.6796/0.6790, Micro P/R/F1: 0.6765/0.6765/0.6765
+Epoch 98/100, Train Loss: 0.5685, Val Loss: 1.0155, Val Acc: 66.59%
+Val Macro P/R/F1: 0.6708/0.6667/0.6671, Micro P/R/F1: 0.6659/0.6659/0.6659
+Test Acc: 67.41%, Test Macro P/R/F1: 0.6782/0.6770/0.6769, Micro P/R/F1: 0.6741/0.6741/0.6741
+Epoch 99/100, Train Loss: 0.5661, Val Loss: 1.0096, Val Acc: 66.00%
+Val Macro P/R/F1: 0.6662/0.6608/0.6614, Micro P/R/F1: 0.6600/0.6600/0.6600
+Test Acc: 67.76%, Test Macro P/R/F1: 0.6827/0.6807/0.6804, Micro P/R/F1: 0.6776/0.6776/0.6776
+Epoch 100/100, Train Loss: 0.5669, Val Loss: 1.0047, Val Acc: 66.24%
+Val Macro P/R/F1: 0.6683/0.6630/0.6637, Micro P/R/F1: 0.6624/0.6624/0.6624
+Test Acc: 67.65%, Test Macro P/R/F1: 0.6818/0.6796/0.6793, Micro P/R/F1: 0.6765/0.6765/0.6765
+
+Evaluating BEST model on test set for confusion matrix ...
+Confusion matrix (rows = true, cols = pred):
+[[ 91   2  14   2   7   2]
+ [  7  97   5  10  15  13]
+ [ 15   5  96   3  18   9]
+ [  4   7   7 108  12   8]
+ [  7   6  31   9  87   7]
+ [  4   9  11  16  10  96]]
+Training results saved to training_runs/results_bs128_ep100_lr1e-05_20251205_002331.json
+Best model (epoch 98, val_acc 66.5882) saved to training_runs/best_model_bs128_ep100_lr1e-05_20251205_002331.pth
+Final model saved to training_runs/final_model_bs128_ep100_lr1e-05_20251205_002331.pth
+
+
+(Retin) E:\00 NTUST_STUDY\02 Semester 02 - 2025\IM6507701 Artificial Intelligence\Final project\multi>python train2.py --batch_size 128 --num_epochs 200 --lr 1e-5
+Example video/audio file pairs:
+1001_DFA_ANG_XX_faces_mp4_features.npy <---> 1001_DFA_ANG_XX_voice_mp4_features.npy
+1001_DFA_DIS_XX_faces_mp4_features.npy <---> 1001_DFA_DIS_XX_voice_mp4_features.npy
+1001_DFA_FEA_XX_faces_mp4_features.npy <---> 1001_DFA_FEA_XX_voice_mp4_features.npy
+1001_DFA_HAP_XX_faces_mp4_features.npy <---> 1001_DFA_HAP_XX_voice_mp4_features.npy
+1001_DFA_NEU_XX_faces_mp4_features.npy <---> 1001_DFA_NEU_XX_voice_mp4_features.npy
+1001_DFA_SAD_XX_faces_mp4_features.npy <---> 1001_DFA_SAD_XX_voice_mp4_features.npy
+1001_IEO_ANG_HI_faces_mp4_features.npy <---> 1001_IEO_ANG_HI_voice_mp4_features.npy
+1001_IEO_ANG_LO_faces_mp4_features.npy <---> 1001_IEO_ANG_LO_voice_mp4_features.npy
+1001_IEO_ANG_MD_faces_mp4_features.npy <---> 1001_IEO_ANG_MD_voice_mp4_features.npy
+1001_IEO_DIS_HI_faces_mp4_features.npy <---> 1001_IEO_DIS_HI_voice_mp4_features.npy
+Maximum number of video chunks: 56
+Train label distribution: Counter({1: 1170, 3: 1170, 2: 1170, 5: 1170, 4: 1170, 0: 947})
+Val label distribution: Counter({5: 147, 3: 147, 1: 146, 4: 146, 2: 146, 0: 118})
+Test label distribution: Counter({4: 147, 1: 147, 5: 146, 3: 146, 2: 146, 0: 118})
+Train samples: 6797, Val samples: 850, Test samples: 850
+C:\Users\PP\anaconda3\envs\Retin\lib\site-packages\torch\nn\modules\transformer.py:286: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
+  warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+C:\Users\PP\anaconda3\envs\Retin\lib\site-packages\torch\nn\functional.py:5476: UserWarning: 1Torch was not compiled with flash attention. (Triggered internally at C:\cb\pytorch_1000000000000\work\aten\src\ATen\native\transformers\cuda\sdp_utils.cpp:263.)
+  attn_output = scaled_dot_product_attention(q, k, v, attn_mask, dropout_p, is_causal)
+Epoch 1/200, Train Loss: 1.8175, Val Loss: 1.7337, Val Acc: 22.59%
+Val Macro P/R/F1: 0.2855/0.2214/0.1754, Micro P/R/F1: 0.2259/0.2259/0.2259
+Test Acc: 22.00%, Test Macro P/R/F1: 0.2563/0.2156/0.1670, Micro P/R/F1: 0.2200/0.2200/0.2200
+Epoch 2/200, Train Loss: 1.7628, Val Loss: 1.6694, Val Acc: 32.94%
+Val Macro P/R/F1: 0.3391/0.3320/0.3236, Micro P/R/F1: 0.3294/0.3294/0.3294
+Test Acc: 31.41%, Test Macro P/R/F1: 0.3183/0.3173/0.3071, Micro P/R/F1: 0.3141/0.3141/0.3141
+Epoch 3/200, Train Loss: 1.7027, Val Loss: 1.6124, Val Acc: 35.65%
+Val Macro P/R/F1: 0.3676/0.3536/0.3516, Micro P/R/F1: 0.3565/0.3565/0.3565
+Test Acc: 36.59%, Test Macro P/R/F1: 0.3787/0.3650/0.3627, Micro P/R/F1: 0.3659/0.3659/0.3659
+Epoch 4/200, Train Loss: 1.6588, Val Loss: 1.5685, Val Acc: 36.82%
+Val Macro P/R/F1: 0.3701/0.3675/0.3618, Micro P/R/F1: 0.3682/0.3682/0.3682
+Test Acc: 39.65%, Test Macro P/R/F1: 0.3995/0.3971/0.3909, Micro P/R/F1: 0.3965/0.3965/0.3965
+Epoch 5/200, Train Loss: 1.6195, Val Loss: 1.5377, Val Acc: 39.06%
+Val Macro P/R/F1: 0.3866/0.3900/0.3836, Micro P/R/F1: 0.3906/0.3906/0.3906
+Test Acc: 40.82%, Test Macro P/R/F1: 0.4023/0.4096/0.4021, Micro P/R/F1: 0.4082/0.4082/0.4082
+Epoch 6/200, Train Loss: 1.5823, Val Loss: 1.5197, Val Acc: 40.71%
+Val Macro P/R/F1: 0.4054/0.4069/0.3970, Micro P/R/F1: 0.4071/0.4071/0.4071
+Test Acc: 40.24%, Test Macro P/R/F1: 0.3957/0.4031/0.3921, Micro P/R/F1: 0.4024/0.4024/0.4024
+Epoch 7/200, Train Loss: 1.5613, Val Loss: 1.4985, Val Acc: 41.76%
+Val Macro P/R/F1: 0.4166/0.4169/0.4096, Micro P/R/F1: 0.4176/0.4176/0.4176
+Test Acc: 42.00%, Test Macro P/R/F1: 0.4134/0.4213/0.4096, Micro P/R/F1: 0.4200/0.4200/0.4200
+Epoch 8/200, Train Loss: 1.5325, Val Loss: 1.4767, Val Acc: 44.12%
+Val Macro P/R/F1: 0.4368/0.4413/0.4331, Micro P/R/F1: 0.4412/0.4412/0.4412
+Test Acc: 42.47%, Test Macro P/R/F1: 0.4207/0.4266/0.4168, Micro P/R/F1: 0.4247/0.4247/0.4247
+Epoch 9/200, Train Loss: 1.4976, Val Loss: 1.4578, Val Acc: 44.00%
+Val Macro P/R/F1: 0.4367/0.4402/0.4342, Micro P/R/F1: 0.4400/0.4400/0.4400
+Test Acc: 44.00%, Test Macro P/R/F1: 0.4344/0.4420/0.4325, Micro P/R/F1: 0.4400/0.4400/0.4400
+Epoch 10/200, Train Loss: 1.4794, Val Loss: 1.4419, Val Acc: 44.35%
+Val Macro P/R/F1: 0.4380/0.4439/0.4359, Micro P/R/F1: 0.4435/0.4435/0.4435
+Test Acc: 43.88%, Test Macro P/R/F1: 0.4323/0.4409/0.4320, Micro P/R/F1: 0.4388/0.4388/0.4388
+Epoch 11/200, Train Loss: 1.4556, Val Loss: 1.4221, Val Acc: 46.59%
+Val Macro P/R/F1: 0.4632/0.4680/0.4621, Micro P/R/F1: 0.4659/0.4659/0.4659
+Test Acc: 44.94%, Test Macro P/R/F1: 0.4441/0.4525/0.4436, Micro P/R/F1: 0.4494/0.4494/0.4494
+Epoch 12/200, Train Loss: 1.4351, Val Loss: 1.4013, Val Acc: 48.00%
+Val Macro P/R/F1: 0.4774/0.4819/0.4753, Micro P/R/F1: 0.4800/0.4800/0.4800
+Test Acc: 45.76%, Test Macro P/R/F1: 0.4516/0.4594/0.4503, Micro P/R/F1: 0.4576/0.4576/0.4576
+Epoch 13/200, Train Loss: 1.4014, Val Loss: 1.3982, Val Acc: 47.18%
+Val Macro P/R/F1: 0.4710/0.4747/0.4653, Micro P/R/F1: 0.4718/0.4718/0.4718
+Test Acc: 47.18%, Test Macro P/R/F1: 0.4659/0.4741/0.4629, Micro P/R/F1: 0.4718/0.4718/0.4718
+Epoch 14/200, Train Loss: 1.4024, Val Loss: 1.3785, Val Acc: 48.82%
+Val Macro P/R/F1: 0.4860/0.4904/0.4839, Micro P/R/F1: 0.4882/0.4882/0.4882
+Test Acc: 47.29%, Test Macro P/R/F1: 0.4672/0.4760/0.4661, Micro P/R/F1: 0.4729/0.4729/0.4729
+Epoch 15/200, Train Loss: 1.3684, Val Loss: 1.3656, Val Acc: 49.76%
+Val Macro P/R/F1: 0.4962/0.4998/0.4946, Micro P/R/F1: 0.4976/0.4976/0.4976
+Test Acc: 49.18%, Test Macro P/R/F1: 0.4859/0.4940/0.4844, Micro P/R/F1: 0.4918/0.4918/0.4918
+Epoch 16/200, Train Loss: 1.3414, Val Loss: 1.3534, Val Acc: 49.53%
+Val Macro P/R/F1: 0.4978/0.4980/0.4895, Micro P/R/F1: 0.4953/0.4953/0.4953
+Test Acc: 49.41%, Test Macro P/R/F1: 0.4900/0.4963/0.4848, Micro P/R/F1: 0.4941/0.4941/0.4941
+Epoch 17/200, Train Loss: 1.3283, Val Loss: 1.3378, Val Acc: 50.00%
+Val Macro P/R/F1: 0.4992/0.5037/0.4970, Micro P/R/F1: 0.5000/0.5000/0.5000
+Test Acc: 49.88%, Test Macro P/R/F1: 0.4956/0.5013/0.4936, Micro P/R/F1: 0.4988/0.4988/0.4988
+Epoch 18/200, Train Loss: 1.3148, Val Loss: 1.3316, Val Acc: 50.12%
+Val Macro P/R/F1: 0.5022/0.5039/0.4984, Micro P/R/F1: 0.5012/0.5012/0.5012
+Test Acc: 50.47%, Test Macro P/R/F1: 0.5033/0.5073/0.4991, Micro P/R/F1: 0.5047/0.5047/0.5047
+Epoch 19/200, Train Loss: 1.2925, Val Loss: 1.3163, Val Acc: 52.12%
+Val Macro P/R/F1: 0.5227/0.5242/0.5200, Micro P/R/F1: 0.5212/0.5212/0.5212
+Test Acc: 51.53%, Test Macro P/R/F1: 0.5122/0.5176/0.5094, Micro P/R/F1: 0.5153/0.5153/0.5153
+Epoch 20/200, Train Loss: 1.2731, Val Loss: 1.3047, Val Acc: 52.24%
+Val Macro P/R/F1: 0.5259/0.5253/0.5205, Micro P/R/F1: 0.5224/0.5224/0.5224
+Test Acc: 51.29%, Test Macro P/R/F1: 0.5096/0.5154/0.5024, Micro P/R/F1: 0.5129/0.5129/0.5129
+Epoch 21/200, Train Loss: 1.2489, Val Loss: 1.3068, Val Acc: 52.24%
+Val Macro P/R/F1: 0.5286/0.5259/0.5206, Micro P/R/F1: 0.5224/0.5224/0.5224
+Test Acc: 50.47%, Test Macro P/R/F1: 0.5013/0.5074/0.4973, Micro P/R/F1: 0.5047/0.5047/0.5047
+Epoch 22/200, Train Loss: 1.2483, Val Loss: 1.2916, Val Acc: 53.29%
+Val Macro P/R/F1: 0.5345/0.5364/0.5315, Micro P/R/F1: 0.5329/0.5329/0.5329
+Test Acc: 51.53%, Test Macro P/R/F1: 0.5127/0.5182/0.5071, Micro P/R/F1: 0.5153/0.5153/0.5153
+Epoch 23/200, Train Loss: 1.2249, Val Loss: 1.2841, Val Acc: 53.53%
+Val Macro P/R/F1: 0.5413/0.5393/0.5349, Micro P/R/F1: 0.5353/0.5353/0.5353
+Test Acc: 51.53%, Test Macro P/R/F1: 0.5154/0.5192/0.5077, Micro P/R/F1: 0.5153/0.5153/0.5153
+Epoch 24/200, Train Loss: 1.2110, Val Loss: 1.2734, Val Acc: 54.00%
+Val Macro P/R/F1: 0.5423/0.5430/0.5396, Micro P/R/F1: 0.5400/0.5400/0.5400
+Test Acc: 52.00%, Test Macro P/R/F1: 0.5170/0.5224/0.5165, Micro P/R/F1: 0.5200/0.5200/0.5200
+Epoch 25/200, Train Loss: 1.1918, Val Loss: 1.2760, Val Acc: 53.29%
+Val Macro P/R/F1: 0.5319/0.5359/0.5312, Micro P/R/F1: 0.5329/0.5329/0.5329
+Test Acc: 52.12%, Test Macro P/R/F1: 0.5177/0.5233/0.5153, Micro P/R/F1: 0.5212/0.5212/0.5212
+Epoch 26/200, Train Loss: 1.1960, Val Loss: 1.2609, Val Acc: 53.29%
+Val Macro P/R/F1: 0.5381/0.5372/0.5316, Micro P/R/F1: 0.5329/0.5329/0.5329
+Test Acc: 53.06%, Test Macro P/R/F1: 0.5303/0.5335/0.5225, Micro P/R/F1: 0.5306/0.5306/0.5306
+Epoch 27/200, Train Loss: 1.1642, Val Loss: 1.2586, Val Acc: 54.71%
+Val Macro P/R/F1: 0.5504/0.5504/0.5463, Micro P/R/F1: 0.5471/0.5471/0.5471
+Test Acc: 52.71%, Test Macro P/R/F1: 0.5269/0.5298/0.5216, Micro P/R/F1: 0.5271/0.5271/0.5271
+Epoch 28/200, Train Loss: 1.1542, Val Loss: 1.2494, Val Acc: 54.94%
+Val Macro P/R/F1: 0.5548/0.5535/0.5485, Micro P/R/F1: 0.5494/0.5494/0.5494
+Test Acc: 53.41%, Test Macro P/R/F1: 0.5350/0.5374/0.5313, Micro P/R/F1: 0.5341/0.5341/0.5341
+Epoch 29/200, Train Loss: 1.1265, Val Loss: 1.2414, Val Acc: 54.47%
+Val Macro P/R/F1: 0.5471/0.5481/0.5436, Micro P/R/F1: 0.5447/0.5447/0.5447
+Test Acc: 53.41%, Test Macro P/R/F1: 0.5329/0.5368/0.5308, Micro P/R/F1: 0.5341/0.5341/0.5341
+Epoch 30/200, Train Loss: 1.1293, Val Loss: 1.2307, Val Acc: 54.94%
+Val Macro P/R/F1: 0.5505/0.5535/0.5488, Micro P/R/F1: 0.5494/0.5494/0.5494
+Test Acc: 54.24%, Test Macro P/R/F1: 0.5410/0.5462/0.5402, Micro P/R/F1: 0.5424/0.5424/0.5424
+Epoch 31/200, Train Loss: 1.1050, Val Loss: 1.2124, Val Acc: 56.00%
+Val Macro P/R/F1: 0.5628/0.5626/0.5604, Micro P/R/F1: 0.5600/0.5600/0.5600
+Test Acc: 54.00%, Test Macro P/R/F1: 0.5418/0.5427/0.5400, Micro P/R/F1: 0.5400/0.5400/0.5400
+Epoch 32/200, Train Loss: 1.0951, Val Loss: 1.2153, Val Acc: 56.35%
+Val Macro P/R/F1: 0.5660/0.5677/0.5621, Micro P/R/F1: 0.5635/0.5635/0.5635
+Test Acc: 55.53%, Test Macro P/R/F1: 0.5559/0.5592/0.5524, Micro P/R/F1: 0.5553/0.5553/0.5553
+Epoch 33/200, Train Loss: 1.0793, Val Loss: 1.2161, Val Acc: 55.53%
+Val Macro P/R/F1: 0.5566/0.5578/0.5545, Micro P/R/F1: 0.5553/0.5553/0.5553
+Test Acc: 55.41%, Test Macro P/R/F1: 0.5550/0.5578/0.5508, Micro P/R/F1: 0.5541/0.5541/0.5541
+Epoch 34/200, Train Loss: 1.0697, Val Loss: 1.2030, Val Acc: 55.41%
+Val Macro P/R/F1: 0.5582/0.5572/0.5538, Micro P/R/F1: 0.5541/0.5541/0.5541
+Test Acc: 54.47%, Test Macro P/R/F1: 0.5494/0.5481/0.5440, Micro P/R/F1: 0.5447/0.5447/0.5447
+Epoch 35/200, Train Loss: 1.0569, Val Loss: 1.1933, Val Acc: 57.06%
+Val Macro P/R/F1: 0.5717/0.5737/0.5697, Micro P/R/F1: 0.5706/0.5706/0.5706
+Test Acc: 55.88%, Test Macro P/R/F1: 0.5588/0.5629/0.5569, Micro P/R/F1: 0.5588/0.5588/0.5588
+Epoch 36/200, Train Loss: 1.0484, Val Loss: 1.1810, Val Acc: 56.71%
+Val Macro P/R/F1: 0.5680/0.5706/0.5669, Micro P/R/F1: 0.5671/0.5671/0.5671
+Test Acc: 56.47%, Test Macro P/R/F1: 0.5642/0.5686/0.5646, Micro P/R/F1: 0.5647/0.5647/0.5647
+Epoch 37/200, Train Loss: 1.0332, Val Loss: 1.1751, Val Acc: 57.65%
+Val Macro P/R/F1: 0.5788/0.5797/0.5766, Micro P/R/F1: 0.5765/0.5765/0.5765
+Test Acc: 55.18%, Test Macro P/R/F1: 0.5543/0.5552/0.5530, Micro P/R/F1: 0.5518/0.5518/0.5518
+Epoch 38/200, Train Loss: 1.0159, Val Loss: 1.1781, Val Acc: 56.94%
+Val Macro P/R/F1: 0.5700/0.5718/0.5693, Micro P/R/F1: 0.5694/0.5694/0.5694
+Test Acc: 57.41%, Test Macro P/R/F1: 0.5740/0.5774/0.5739, Micro P/R/F1: 0.5741/0.5741/0.5741
+Epoch 39/200, Train Loss: 1.0062, Val Loss: 1.1650, Val Acc: 57.29%
+Val Macro P/R/F1: 0.5764/0.5757/0.5731, Micro P/R/F1: 0.5729/0.5729/0.5729
+Test Acc: 55.76%, Test Macro P/R/F1: 0.5603/0.5609/0.5582, Micro P/R/F1: 0.5576/0.5576/0.5576
+Epoch 40/200, Train Loss: 1.0047, Val Loss: 1.1545, Val Acc: 58.24%
+Val Macro P/R/F1: 0.5849/0.5846/0.5822, Micro P/R/F1: 0.5824/0.5824/0.5824
+Test Acc: 57.18%, Test Macro P/R/F1: 0.5732/0.5749/0.5716, Micro P/R/F1: 0.5718/0.5718/0.5718
+Epoch 41/200, Train Loss: 0.9745, Val Loss: 1.1601, Val Acc: 57.88%
+Val Macro P/R/F1: 0.5865/0.5822/0.5795, Micro P/R/F1: 0.5788/0.5788/0.5788
+Test Acc: 57.18%, Test Macro P/R/F1: 0.5742/0.5741/0.5710, Micro P/R/F1: 0.5718/0.5718/0.5718
+Epoch 42/200, Train Loss: 0.9687, Val Loss: 1.1606, Val Acc: 58.71%
+Val Macro P/R/F1: 0.5944/0.5911/0.5869, Micro P/R/F1: 0.5871/0.5871/0.5871
+Test Acc: 57.53%, Test Macro P/R/F1: 0.5770/0.5791/0.5749, Micro P/R/F1: 0.5753/0.5753/0.5753
+Epoch 43/200, Train Loss: 0.9686, Val Loss: 1.1503, Val Acc: 58.35%
+Val Macro P/R/F1: 0.5869/0.5857/0.5834, Micro P/R/F1: 0.5835/0.5835/0.5835
+Test Acc: 57.29%, Test Macro P/R/F1: 0.5763/0.5757/0.5727, Micro P/R/F1: 0.5729/0.5729/0.5729
+Epoch 44/200, Train Loss: 0.9557, Val Loss: 1.1313, Val Acc: 58.47%
+Val Macro P/R/F1: 0.5896/0.5874/0.5854, Micro P/R/F1: 0.5847/0.5847/0.5847
+Test Acc: 57.18%, Test Macro P/R/F1: 0.5731/0.5751/0.5716, Micro P/R/F1: 0.5718/0.5718/0.5718
+Epoch 45/200, Train Loss: 0.9515, Val Loss: 1.1585, Val Acc: 58.59%
+Val Macro P/R/F1: 0.5906/0.5891/0.5845, Micro P/R/F1: 0.5859/0.5859/0.5859
+Test Acc: 58.71%, Test Macro P/R/F1: 0.5897/0.5910/0.5875, Micro P/R/F1: 0.5871/0.5871/0.5871
+Epoch 46/200, Train Loss: 0.9383, Val Loss: 1.1290, Val Acc: 58.94%
+Val Macro P/R/F1: 0.5931/0.5908/0.5900, Micro P/R/F1: 0.5894/0.5894/0.5894
+Test Acc: 58.12%, Test Macro P/R/F1: 0.5846/0.5837/0.5826, Micro P/R/F1: 0.5812/0.5812/0.5812
+Epoch 47/200, Train Loss: 0.9164, Val Loss: 1.1266, Val Acc: 59.06%
+Val Macro P/R/F1: 0.5955/0.5942/0.5905, Micro P/R/F1: 0.5906/0.5906/0.5906
+Test Acc: 58.59%, Test Macro P/R/F1: 0.5868/0.5893/0.5868, Micro P/R/F1: 0.5859/0.5859/0.5859
+Epoch 48/200, Train Loss: 0.9126, Val Loss: 1.1209, Val Acc: 59.29%
+Val Macro P/R/F1: 0.5992/0.5957/0.5935, Micro P/R/F1: 0.5929/0.5929/0.5929
+Test Acc: 58.24%, Test Macro P/R/F1: 0.5874/0.5859/0.5841, Micro P/R/F1: 0.5824/0.5824/0.5824
+Epoch 49/200, Train Loss: 0.9020, Val Loss: 1.1239, Val Acc: 59.65%
+Val Macro P/R/F1: 0.6001/0.5990/0.5967, Micro P/R/F1: 0.5965/0.5965/0.5965
+Test Acc: 58.71%, Test Macro P/R/F1: 0.5910/0.5902/0.5882, Micro P/R/F1: 0.5871/0.5871/0.5871
+Epoch 50/200, Train Loss: 0.8878, Val Loss: 1.1228, Val Acc: 59.76%
+Val Macro P/R/F1: 0.6037/0.5996/0.5985, Micro P/R/F1: 0.5976/0.5976/0.5976
+Test Acc: 59.76%, Test Macro P/R/F1: 0.5993/0.6001/0.5984, Micro P/R/F1: 0.5976/0.5976/0.5976
+Epoch 51/200, Train Loss: 0.8721, Val Loss: 1.1190, Val Acc: 59.06%
+Val Macro P/R/F1: 0.5966/0.5942/0.5919, Micro P/R/F1: 0.5906/0.5906/0.5906
+Test Acc: 58.82%, Test Macro P/R/F1: 0.5899/0.5908/0.5892, Micro P/R/F1: 0.5882/0.5882/0.5882
+Epoch 52/200, Train Loss: 0.8754, Val Loss: 1.0978, Val Acc: 60.59%
+Val Macro P/R/F1: 0.6108/0.6093/0.6066, Micro P/R/F1: 0.6059/0.6059/0.6059
+Test Acc: 60.82%, Test Macro P/R/F1: 0.6079/0.6115/0.6088, Micro P/R/F1: 0.6082/0.6082/0.6082
+Epoch 53/200, Train Loss: 0.8600, Val Loss: 1.1019, Val Acc: 61.06%
+Val Macro P/R/F1: 0.6184/0.6130/0.6120, Micro P/R/F1: 0.6106/0.6106/0.6106
+Test Acc: 59.06%, Test Macro P/R/F1: 0.5959/0.5941/0.5917, Micro P/R/F1: 0.5906/0.5906/0.5906
+Epoch 54/200, Train Loss: 0.8597, Val Loss: 1.0877, Val Acc: 60.35%
+Val Macro P/R/F1: 0.6095/0.6064/0.6045, Micro P/R/F1: 0.6035/0.6035/0.6035
+Test Acc: 60.24%, Test Macro P/R/F1: 0.6047/0.6057/0.6037, Micro P/R/F1: 0.6024/0.6024/0.6024
+Epoch 55/200, Train Loss: 0.8531, Val Loss: 1.0875, Val Acc: 60.59%
+Val Macro P/R/F1: 0.6113/0.6085/0.6060, Micro P/R/F1: 0.6059/0.6059/0.6059
+Test Acc: 60.94%, Test Macro P/R/F1: 0.6097/0.6126/0.6090, Micro P/R/F1: 0.6094/0.6094/0.6094
+Epoch 56/200, Train Loss: 0.8424, Val Loss: 1.0729, Val Acc: 60.82%
+Val Macro P/R/F1: 0.6154/0.6104/0.6096, Micro P/R/F1: 0.6082/0.6082/0.6082
+Test Acc: 61.41%, Test Macro P/R/F1: 0.6172/0.6177/0.6156, Micro P/R/F1: 0.6141/0.6141/0.6141
+Epoch 57/200, Train Loss: 0.8285, Val Loss: 1.0807, Val Acc: 61.06%
+Val Macro P/R/F1: 0.6168/0.6127/0.6123, Micro P/R/F1: 0.6106/0.6106/0.6106
+Test Acc: 61.76%, Test Macro P/R/F1: 0.6196/0.6209/0.6185, Micro P/R/F1: 0.6176/0.6176/0.6176
+Epoch 58/200, Train Loss: 0.8106, Val Loss: 1.0696, Val Acc: 61.53%
+Val Macro P/R/F1: 0.6236/0.6175/0.6166, Micro P/R/F1: 0.6153/0.6153/0.6153
+Test Acc: 61.29%, Test Macro P/R/F1: 0.6177/0.6165/0.6147, Micro P/R/F1: 0.6129/0.6129/0.6129
+Epoch 59/200, Train Loss: 0.8047, Val Loss: 1.0714, Val Acc: 61.29%
+Val Macro P/R/F1: 0.6199/0.6155/0.6138, Micro P/R/F1: 0.6129/0.6129/0.6129
+Test Acc: 62.35%, Test Macro P/R/F1: 0.6276/0.6265/0.6243, Micro P/R/F1: 0.6235/0.6235/0.6235
+Epoch 60/200, Train Loss: 0.8055, Val Loss: 1.0840, Val Acc: 61.29%
+Val Macro P/R/F1: 0.6217/0.6150/0.6140, Micro P/R/F1: 0.6129/0.6129/0.6129
+Test Acc: 61.06%, Test Macro P/R/F1: 0.6157/0.6135/0.6118, Micro P/R/F1: 0.6106/0.6106/0.6106
+Epoch 61/200, Train Loss: 0.7969, Val Loss: 1.0687, Val Acc: 61.06%
+Val Macro P/R/F1: 0.6186/0.6130/0.6115, Micro P/R/F1: 0.6106/0.6106/0.6106
+Test Acc: 61.29%, Test Macro P/R/F1: 0.6173/0.6165/0.6150, Micro P/R/F1: 0.6129/0.6129/0.6129
+Epoch 62/200, Train Loss: 0.7932, Val Loss: 1.0962, Val Acc: 61.76%
+Val Macro P/R/F1: 0.6252/0.6198/0.6194, Micro P/R/F1: 0.6176/0.6176/0.6176
+Test Acc: 61.29%, Test Macro P/R/F1: 0.6149/0.6152/0.6140, Micro P/R/F1: 0.6129/0.6129/0.6129
+Epoch 63/200, Train Loss: 0.7790, Val Loss: 1.0623, Val Acc: 62.00%
+Val Macro P/R/F1: 0.6291/0.6221/0.6218, Micro P/R/F1: 0.6200/0.6200/0.6200
+Test Acc: 62.12%, Test Macro P/R/F1: 0.6282/0.6231/0.6236, Micro P/R/F1: 0.6212/0.6212/0.6212
+Epoch 64/200, Train Loss: 0.7549, Val Loss: 1.0578, Val Acc: 62.00%
+Val Macro P/R/F1: 0.6247/0.6215/0.6206, Micro P/R/F1: 0.6200/0.6200/0.6200
+Test Acc: 61.88%, Test Macro P/R/F1: 0.6198/0.6220/0.6195, Micro P/R/F1: 0.6188/0.6188/0.6188
+Epoch 65/200, Train Loss: 0.7647, Val Loss: 1.0603, Val Acc: 61.18%
+Val Macro P/R/F1: 0.6162/0.6144/0.6126, Micro P/R/F1: 0.6118/0.6118/0.6118
+Test Acc: 62.82%, Test Macro P/R/F1: 0.6298/0.6316/0.6292, Micro P/R/F1: 0.6282/0.6282/0.6282
+Epoch 66/200, Train Loss: 0.7489, Val Loss: 1.0632, Val Acc: 62.12%
+Val Macro P/R/F1: 0.6310/0.6235/0.6232, Micro P/R/F1: 0.6212/0.6212/0.6212
+Test Acc: 62.12%, Test Macro P/R/F1: 0.6252/0.6248/0.6232, Micro P/R/F1: 0.6212/0.6212/0.6212
+Epoch 67/200, Train Loss: 0.7383, Val Loss: 1.0722, Val Acc: 62.71%
+Val Macro P/R/F1: 0.6311/0.6300/0.6280, Micro P/R/F1: 0.6271/0.6271/0.6271
+Test Acc: 61.06%, Test Macro P/R/F1: 0.6146/0.6142/0.6135, Micro P/R/F1: 0.6106/0.6106/0.6106
+Epoch 68/200, Train Loss: 0.7413, Val Loss: 1.0658, Val Acc: 62.12%
+Val Macro P/R/F1: 0.6269/0.6232/0.6226, Micro P/R/F1: 0.6212/0.6212/0.6212
+Test Acc: 61.76%, Test Macro P/R/F1: 0.6218/0.6203/0.6198, Micro P/R/F1: 0.6176/0.6176/0.6176
+Epoch 69/200, Train Loss: 0.7255, Val Loss: 1.0605, Val Acc: 61.65%
+Val Macro P/R/F1: 0.6243/0.6178/0.6185, Micro P/R/F1: 0.6165/0.6165/0.6165
+Test Acc: 62.94%, Test Macro P/R/F1: 0.6348/0.6323/0.6314, Micro P/R/F1: 0.6294/0.6294/0.6294
+Epoch 70/200, Train Loss: 0.7159, Val Loss: 1.0740, Val Acc: 61.65%
+Val Macro P/R/F1: 0.6233/0.6184/0.6174, Micro P/R/F1: 0.6165/0.6165/0.6165
+Test Acc: 62.24%, Test Macro P/R/F1: 0.6287/0.6259/0.6248, Micro P/R/F1: 0.6224/0.6224/0.6224
+Epoch 71/200, Train Loss: 0.6964, Val Loss: 1.0571, Val Acc: 63.06%
+Val Macro P/R/F1: 0.6367/0.6321/0.6317, Micro P/R/F1: 0.6306/0.6306/0.6306
+Test Acc: 63.06%, Test Macro P/R/F1: 0.6353/0.6333/0.6329, Micro P/R/F1: 0.6306/0.6306/0.6306
+Epoch 72/200, Train Loss: 0.6963, Val Loss: 1.0439, Val Acc: 62.00%
+Val Macro P/R/F1: 0.6254/0.6218/0.6213, Micro P/R/F1: 0.6200/0.6200/0.6200
+Test Acc: 63.88%, Test Macro P/R/F1: 0.6417/0.6419/0.6407, Micro P/R/F1: 0.6388/0.6388/0.6388
+Epoch 73/200, Train Loss: 0.7039, Val Loss: 1.0498, Val Acc: 61.76%
+Val Macro P/R/F1: 0.6235/0.6195/0.6189, Micro P/R/F1: 0.6176/0.6176/0.6176
+Test Acc: 63.18%, Test Macro P/R/F1: 0.6363/0.6353/0.6340, Micro P/R/F1: 0.6318/0.6318/0.6318
+Epoch 74/200, Train Loss: 0.6991, Val Loss: 1.0421, Val Acc: 62.35%
+Val Macro P/R/F1: 0.6276/0.6255/0.6246, Micro P/R/F1: 0.6235/0.6235/0.6235
+Test Acc: 63.29%, Test Macro P/R/F1: 0.6355/0.6362/0.6348, Micro P/R/F1: 0.6329/0.6329/0.6329
+Epoch 75/200, Train Loss: 0.6944, Val Loss: 1.0410, Val Acc: 62.47%
+Val Macro P/R/F1: 0.6290/0.6264/0.6256, Micro P/R/F1: 0.6247/0.6247/0.6247
+Test Acc: 63.53%, Test Macro P/R/F1: 0.6380/0.6384/0.6373, Micro P/R/F1: 0.6353/0.6353/0.6353
+Epoch 76/200, Train Loss: 0.6736, Val Loss: 1.0461, Val Acc: 62.47%
+Val Macro P/R/F1: 0.6304/0.6269/0.6259, Micro P/R/F1: 0.6247/0.6247/0.6247
+Test Acc: 63.88%, Test Macro P/R/F1: 0.6418/0.6421/0.6407, Micro P/R/F1: 0.6388/0.6388/0.6388
+Epoch 77/200, Train Loss: 0.6974, Val Loss: 1.0527, Val Acc: 63.18%
+Val Macro P/R/F1: 0.6381/0.6332/0.6334, Micro P/R/F1: 0.6318/0.6318/0.6318
+Test Acc: 64.00%, Test Macro P/R/F1: 0.6444/0.6430/0.6426, Micro P/R/F1: 0.6400/0.6400/0.6400
+Epoch 78/200, Train Loss: 0.6837, Val Loss: 1.0506, Val Acc: 62.94%
+Val Macro P/R/F1: 0.6334/0.6309/0.6302, Micro P/R/F1: 0.6294/0.6294/0.6294
+Test Acc: 63.76%, Test Macro P/R/F1: 0.6402/0.6413/0.6393, Micro P/R/F1: 0.6376/0.6376/0.6376
+Epoch 79/200, Train Loss: 0.6745, Val Loss: 1.0466, Val Acc: 62.94%
+Val Macro P/R/F1: 0.6340/0.6309/0.6302, Micro P/R/F1: 0.6294/0.6294/0.6294
+Test Acc: 63.06%, Test Macro P/R/F1: 0.6337/0.6344/0.6327, Micro P/R/F1: 0.6306/0.6306/0.6306
+Epoch 80/200, Train Loss: 0.6691, Val Loss: 1.0445, Val Acc: 62.47%
+Val Macro P/R/F1: 0.6293/0.6263/0.6257, Micro P/R/F1: 0.6247/0.6247/0.6247
+Test Acc: 63.65%, Test Macro P/R/F1: 0.6395/0.6398/0.6385, Micro P/R/F1: 0.6365/0.6365/0.6365
+Epoch 81/200, Train Loss: 0.6684, Val Loss: 1.0385, Val Acc: 62.71%
+Val Macro P/R/F1: 0.6318/0.6289/0.6282, Micro P/R/F1: 0.6271/0.6271/0.6271
+Test Acc: 63.76%, Test Macro P/R/F1: 0.6419/0.6402/0.6398, Micro P/R/F1: 0.6376/0.6376/0.6376
+Epoch 82/200, Train Loss: 0.6646, Val Loss: 1.0321, Val Acc: 62.71%
+Val Macro P/R/F1: 0.6316/0.6289/0.6282, Micro P/R/F1: 0.6271/0.6271/0.6271
+Test Acc: 63.65%, Test Macro P/R/F1: 0.6383/0.6396/0.6382, Micro P/R/F1: 0.6365/0.6365/0.6365
+Epoch 83/200, Train Loss: 0.6556, Val Loss: 1.0411, Val Acc: 62.82%
+Val Macro P/R/F1: 0.6334/0.6295/0.6297, Micro P/R/F1: 0.6282/0.6282/0.6282
+Test Acc: 64.12%, Test Macro P/R/F1: 0.6457/0.6438/0.6440, Micro P/R/F1: 0.6412/0.6412/0.6412
+Epoch 84/200, Train Loss: 0.6609, Val Loss: 1.0410, Val Acc: 62.94%
+Val Macro P/R/F1: 0.6333/0.6312/0.6303, Micro P/R/F1: 0.6294/0.6294/0.6294
+Test Acc: 63.18%, Test Macro P/R/F1: 0.6332/0.6356/0.6334, Micro P/R/F1: 0.6318/0.6318/0.6318
+Early stopping at epoch 85
+
+Evaluating BEST model on test set for confusion matrix ...
+Confusion matrix (rows = true, cols = pred):
+[[ 88   4  13   2   7   4]
+ [  9  91   4  11  20  12]
+ [ 13   6  91   3  24   9]
+ [  7   8   9 108  11   3]
+ [ 11   7  25   8  79  17]
+ [  8  10  11  14  16  87]]
+Training results saved to training_runs/results_bs128_ep200_lr1e-05_20251205_004717.json
+Best model (epoch 77, val_acc 63.1765) saved to training_runs/best_model_bs128_ep200_lr1e-05_20251205_004717.pth
+Final model saved to training_runs/final_model_bs128_ep200_lr1e-05_20251205_004717.pth
