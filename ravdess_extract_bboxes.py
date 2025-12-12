@@ -7,11 +7,13 @@ from pathlib import Path
 import glob
 from ultralytics import YOLO
 from huggingface_hub import hf_hub_download
+import torch
 
 # Download and load the pre-trained YOLO face detection model from Hugging Face
 os.makedirs("models", exist_ok=True)
 model_path = hf_hub_download(repo_id="AdamCodd/YOLOv11n-face-detection", filename="model.pt", local_dir="models")
-model = YOLO(model_path, device=0)  # Use GPU (device=0) for faster processing
+model = YOLO(model_path)  # Load the model
+model.to('cuda' if torch.cuda.is_available() else 'cpu')  # Move to GPU if available
 
 input_dir = "/home/sionna/Downloads/1188976"  # <-- Change this to the directory containing child folders with videos
 output_bboxes_folder = "extracted_bboxes"  # Where to save bounding box data

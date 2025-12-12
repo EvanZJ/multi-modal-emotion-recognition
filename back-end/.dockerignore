@@ -1,0 +1,20 @@
+# Ignore python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+
+# Docker files
+Dockerfile*
+
+# Distribution / packaging
+.build/
+dist/
+*.egg-info/
+
+# System files
+*.swp
+*.DS_Store

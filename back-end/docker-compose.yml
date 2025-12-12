@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mm-emotion-backend:latest
+    container_name: mm_emotion_backend
+    environment:
+      - PORT=8000
+      - ENV=development
+      - RELOAD=true
+    volumes:
+      - ./app:/app/app:ro
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    command: ["/app/start.sh"]
