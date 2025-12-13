@@ -15,9 +15,11 @@ interface VideoPlayerProps {
   boundingBoxes: BoundingBox[]
   fileName?: string
   annotations?: any
+  externalTime?: number
+  onTimeChange?: (time: number) => void
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxes, fileName, annotations }) => {
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxes, fileName, annotations, externalTime, onTimeChange }) => {
   const [isFlvFile, setIsFlvFile] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -241,9 +243,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
       ctx.fillStyle = color
       ctx.font = '12px Arial'
       const label = box.label ?? 'box'
-      ctx.fillRect(scaledX, scaledY - 20, ctx.measureText(label).width + 10, 20)
+      const labelLines = label.split('\n')
+      const lineHeight = 14
+      const labelHeight = labelLines.length * lineHeight
+      const labelWidth = Math.max(...labelLines.map(line => ctx.measureText(line).width)) + 10
+      
+      // Draw background rectangle
+      ctx.fillRect(scaledX, scaledY - labelHeight - 4, labelWidth, labelHeight + 4)
+      
+      // Draw text lines
       ctx.fillStyle = '#ffffff'
-      ctx.fillText(label, scaledX + 5, scaledY - 5)
+      labelLines.forEach((line, index) => {
+        ctx.fillText(line, scaledX + 5, scaledY - labelHeight + 4 + (index * lineHeight) + 10)
+      })
     }
     
     if (Object.keys(annotationMap).length === 0) {
@@ -635,7 +647,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
     }
 
     const handleTimeUpdate = () => {
-      setCurrentTime(video.currentTime)
+      const newTime = video.currentTime
+      setCurrentTime(newTime)
+      onTimeChange?.(newTime)
     }
 
     const handleError = () => {
@@ -692,6 +706,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
     }
   }, [])
 
+  // Sync external time updates
+  useEffect(() => {
+    if (externalTime !== undefined && videoRef.current && Math.abs(videoRef.current.currentTime - externalTime) > 0.1) {
+      videoRef.current.currentTime = externalTime
+    }
+  }, [externalTime])
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value)
     if (videoRef.current) {
@@ -703,23 +724,25 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
     <div className="space-y-4">
       <div className="relative bg-black rounded-md overflow-hidden">
         {isFlvFile && isConverting && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 text-white z-10">
-            <div className="text-center p-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-              <p className="text-sm mb-2">Converting FLV to MP4...</p>
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+            <div className="text-center p-6 text-white max-w-sm">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-lg font-medium mb-2">Converting FLV to MP4</p>
               {detectedCodec && (
-                <p className="text-xs mb-2 opacity-75">Detected codec: {detectedCodec}</p>
+                <p className="text-sm opacity-75 mb-4">Detected codec: {detectedCodec}</p>
               )}
               {detectedCodec && detectedCodec.toLowerCase().indexOf('vp6') !== -1 && (
-                <p className="text-xs text-yellow-300 mb-2">Note: VP6 (Flash) codec detected; conversion may be slow or may fail in-browser. Consider server-side conversion for large files.</p>
+                <p className="text-xs text-yellow-300 mb-4">
+                  Note: VP6 (Flash) codec detected; conversion may be slow or may fail in-browser
+                </p>
               )}
-              <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="w-full bg-slate-700 rounded-full h-2 mb-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${conversionProgress}%` }}
                 ></div>
               </div>
-              <p className="text-xs mt-2 opacity-75">{conversionProgress}%</p>
+              <p className="text-sm opacity-75">{conversionProgress}% complete</p>
             </div>
           </div>
         )}
@@ -750,24 +773,24 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
           />
         )}
         {isStreamingFallback && (
-          <div className="absolute top-2 right-2 bg-yellow-500 text-black px-2 py-1 rounded text-xs">
+          <div className="absolute top-3 right-3 bg-yellow-500 text-slate-900 px-3 py-1 rounded-md text-xs font-medium shadow-lg">
             Streaming FLV (fallback)
           </div>
         )}
         {!isLoaded && !error && !isConverting && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
-              Loading video...
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+            <div className="text-center text-white">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-3"></div>
+              <p className="text-sm font-medium">Loading video...</p>
             </div>
           </div>
         )}
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 text-white">
-            <div className="text-center p-4">
-              <div className="text-red-400 text-lg mb-2">⚠️</div>
-              <p className="text-sm">{error}</p>
-                <p className="text-xs mt-2 opacity-75">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+            <div className="text-center p-6 text-white max-w-md">
+              <div className="text-red-400 text-2xl mb-3">⚠️</div>
+              <p className="text-sm font-medium mb-2">{error}</p>
+              <p className="text-xs opacity-75">
                 {isFlvFile ? (
                   detectedCodec && detectedCodec.toLowerCase().indexOf('vp6') !== -1 ?
                   'FLV conversion failed: file uses On2 VP6 (Flash). Client-side conversion to MP4 may not be possible. Consider server-side conversion.' :
@@ -779,46 +802,44 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, boundingBoxe
         )}
       </div>
       {!isConverting && (
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 mt-4">
           <input
             type="range"
             min="0"
             max={duration || 100}
             value={currentTime}
             onChange={handleSeek}
-            className="flex-1"
+            className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             disabled={!isLoaded || !!error}
           />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-slate-600 font-medium">
             {Math.floor(currentTime)}s / {Math.floor(duration)}s
           </span>
         </div>
       )}
-      {convertedVideoUrl && (
-        <div className="flex items-center gap-4 mt-2">
+
+      {/* Controls */}
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center gap-2">
+          {annotations && Object.keys(annotations).length > 0 && (
+            <button
+              onClick={() => setShowAnnotations(v => !v)}
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-sm font-medium transition-colors"
+            >
+              {showAnnotations ? 'Hide' : 'Show'} annotations
+            </button>
+          )}
+        </div>
+
+        {convertedVideoUrl && (
           <a
             href={convertedVideoUrl}
             download={(fileName || 'converted').replace(/\.flv$/i, '.mp4')}
-            className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
           >
-            Download converted
+            Download MP4
           </a>
-        </div>
-      )}
-      <div className="flex items-center gap-4 mt-2">
-        <button
-          onClick={handleForceConvert}
-          className="px-3 py-1 bg-green-600 text-white rounded text-sm"
-          disabled={isConverting}
-        >
-          Force Convert
-        </button>
-        <button
-          onClick={() => setShowAnnotations(v => !v)}
-          className="px-3 py-1 bg-gray-700 text-white rounded text-sm"
-        >
-          {showAnnotations ? 'Hide' : 'Show'} annotations ({frameAnnotationBoxes.length})
-        </button>
+        )}
       </div>
     </div>
   )
