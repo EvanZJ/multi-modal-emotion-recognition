@@ -21,6 +21,33 @@ This system performs multi-modal emotion recognition by:
 
 The model is trained on datasets like RAVDESS and CREMA-D with careful preprocessing and data augmentation strategies.
 
+### Emotion Classes
+
+The system recognizes **6 emotion categories**:
+
+| Class ID | Abbreviation | Full Name | Description |
+|----------|-------------|-----------|-------------|
+| 0 | NEU | Neutral | Calm, neutral emotional state |
+| 1 | HAP | Happy | Joyful, positive emotional state |
+| 2 | SAD | Sad | Unhappy, sorrowful emotional state |
+| 3 | ANG | Angry | Irritated, frustrated emotional state |
+| 4 | FEA | Fearful | Anxious, scared emotional state |
+| 5 | DIS | Disgusted | Repulsed, disgusted emotional state |
+
+**Note**: The model outputs probability scores for all 6 classes, allowing for multi-label interpretation and confidence analysis.
+
+#### Dataset Emotion Mappings
+
+**RAVDESS Dataset** (originally 8 emotions):
+- **Original emotions**: calm, happy, sad, angry, fearful, surprise, disgust, neutral
+- **Mapped to 6 classes**: calm → NEU, happy → HAP, sad → SAD, angry → ANG, fearful → FEA, surprise → removed, disgust → DIS, neutral → NEU
+
+**CREMA-D Dataset** (originally 6 emotions):
+- **Original emotions**: happy, sad, anger, fear, disgust, neutral
+- **Mapped to 6 classes**: happy → HAP, sad → SAD, anger → ANG, fear → FEA, disgust → DIS, neutral → NEU
+
+Both datasets are standardized to the same 6 emotion classes for unified model training and inference.
+
 ## Python Utilities
 
 ### Core Python Scripts

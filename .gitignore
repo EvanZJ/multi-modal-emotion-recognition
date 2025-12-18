@@ -13,6 +13,7 @@ extracted_audio/
 extracted_bboxes/
 extracted_faces_videos/
 models/
+dataset/
 
 # Data folders
 
