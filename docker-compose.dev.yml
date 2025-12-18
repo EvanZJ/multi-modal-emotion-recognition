@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    image: mm-emotion-backend:dev
+    container_name: mm_emotion_backend_dev
+    environment:
+      - PORT=8000
+      - ENV=development
+      - RELOAD=true
+    volumes:
+      - ./back-end:/app:rw
+    restart: unless-stopped
+
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    image: mm-emotion-frontend:dev
+    container_name: mm_emotion_frontend_dev
+    volumes:
+      - ./front-end:/app:rw
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+    command: npm run dev
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: mm_emotion_nginx_dev
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - front-end
+    restart: unless-stopped
+
+networks:
+  default:
+    name: mm_emotion_network_dev

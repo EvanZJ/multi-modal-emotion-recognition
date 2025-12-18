@@ -11,3 +11,6 @@ ffmpeg-python>=0.2.0
 opencv-python>=4.8.1.76
 numpy>=1.25.0
 soundfile>=0.12.1
+ultralytics>=8.0.0
+huggingface-hub>=0.20.0
+captum>=0.6.0
